@@ -1,0 +1,20 @@
+name = "gnc"
+version = "0.1.0"
+defaultTargets = ["Verification"]
+
+[[require]]
+name = "mathlib"
+path = ".lake/packages/mathlib"
+
+[[lean_lib]]
+name = "GNC"
+globs = [
+  "GNC.All", "GNC.Core", "GNC.Applications",
+  "GNC.Algebra.+", "GNC.Analysis.+", "GNC.Lie.+", "GNC.Dynamics.+",
+  "GNC.Estimation.+", "GNC.Preintegration.+", "GNC.Magnus.+",
+  "GNC.Planning.+", "GNC.Control.+", "GNC.Applications.+", "GNC.Tools.+"
+]
+
+[[lean_lib]]
+name = "Verification"
+srcDir = "GNC"

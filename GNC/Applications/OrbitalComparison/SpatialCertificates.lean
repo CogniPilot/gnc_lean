@@ -1,0 +1,36 @@
+import GNC.Applications.OrbitalComparison.SpatialData.InertialCircleTime10
+import GNC.Applications.OrbitalComparison.SpatialData.InertialCircleTime12
+import GNC.Applications.OrbitalComparison.SpatialData.InertialCircleTime14
+import GNC.Applications.OrbitalComparison.SpatialData.InertialSTT10Time10
+import GNC.Applications.OrbitalComparison.SpatialData.InertialSTT10Time12
+import GNC.Applications.OrbitalComparison.SpatialData.InertialSTT10Time14
+import GNC.Applications.OrbitalComparison.SpatialData.InertialSTT8Time10
+import GNC.Applications.OrbitalComparison.SpatialData.InertialSTT8Time12
+import GNC.Applications.OrbitalComparison.SpatialData.InertialSTT8Time14
+import GNC.Applications.OrbitalComparison.SpatialData.RTNFrameCircleTime10
+import GNC.Applications.OrbitalComparison.SpatialData.RTNFrameCircleTime12
+import GNC.Applications.OrbitalComparison.SpatialData.RTNFrameCircleTime14
+import GNC.Applications.OrbitalComparison.SpatialData.RTNFrameSTT10Time10
+import GNC.Applications.OrbitalComparison.SpatialData.RTNFrameSTT10Time12
+import GNC.Applications.OrbitalComparison.SpatialData.RTNFrameSTT10Time14
+import GNC.Applications.OrbitalComparison.SpatialData.RTNFrameSTT8Time10
+import GNC.Applications.OrbitalComparison.SpatialData.RTNFrameSTT8Time12
+import GNC.Applications.OrbitalComparison.SpatialData.RTNFrameSTT8Time14
+import GNC.Applications.OrbitalComparison.SpatialData.RTNInertialCircleTime10
+import GNC.Applications.OrbitalComparison.SpatialData.RTNInertialCircleTime12
+import GNC.Applications.OrbitalComparison.SpatialData.RTNInertialCircleTime14
+import GNC.Applications.OrbitalComparison.SpatialData.RTNInertialSTT10Time10
+import GNC.Applications.OrbitalComparison.SpatialData.RTNInertialSTT10Time12
+import GNC.Applications.OrbitalComparison.SpatialData.RTNInertialSTT10Time14
+import GNC.Applications.OrbitalComparison.SpatialData.RTNInertialSTT8Time10
+import GNC.Applications.OrbitalComparison.SpatialData.RTNInertialSTT8Time12
+import GNC.Applications.OrbitalComparison.SpatialData.RTNInertialSTT8Time14
+import GNC.Applications.OrbitalComparison.SpatialTerminalBounds
+import GNC.Applications.OrbitalComparison.SpatialTaylorLowerBound
+import GNC.Applications.OrbitalComparison.SpatialData.RTNFrameSTT7Time14
+import GNC.Applications.OrbitalComparison.SpatialData.RTNInertialSTT7Time14
+import GNC.Applications.OrbitalComparison.SpatialData.InertialSTT7Time14
+
+/-! Uniform full-gravity finite-burn certificates in three dimensions.
+The three burn/offset laws use their own physical zero-offset nominal.
+Every coefficient record is checked independently of its generator. -/

@@ -1,0 +1,15 @@
+.lake/
+.direnv/
+/result
+/result-*
+__pycache__/
+*.py[cod]
+
+# Local TeX build products (published PDFs and source figures remain tracked).
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc

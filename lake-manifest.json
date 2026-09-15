@@ -1,0 +1,89 @@
+{
+  "version": "1.1.0",
+  "packagesDir": ".lake/packages",
+  "packages": [
+    {
+      "type": "path",
+      "scope": "",
+      "name": "Cli",
+      "dir": ".lake/packages/Cli",
+      "inherited": true,
+      "configFile": "lakefile.toml",
+      "manifestFile": "lake-manifest.json"
+    },
+    {
+      "type": "path",
+      "scope": "",
+      "name": "LeanSearchClient",
+      "dir": ".lake/packages/LeanSearchClient",
+      "inherited": true,
+      "configFile": "lakefile.toml",
+      "manifestFile": "lake-manifest.json"
+    },
+    {
+      "type": "path",
+      "scope": "",
+      "name": "Qq",
+      "dir": ".lake/packages/Qq",
+      "inherited": true,
+      "configFile": "lakefile.toml",
+      "manifestFile": "lake-manifest.json"
+    },
+    {
+      "type": "path",
+      "scope": "",
+      "name": "aesop",
+      "dir": ".lake/packages/aesop",
+      "inherited": true,
+      "configFile": "lakefile.toml",
+      "manifestFile": "lake-manifest.json"
+    },
+    {
+      "type": "path",
+      "scope": "",
+      "name": "batteries",
+      "dir": ".lake/packages/batteries",
+      "inherited": true,
+      "configFile": "lakefile.toml",
+      "manifestFile": "lake-manifest.json"
+    },
+    {
+      "type": "path",
+      "scope": "",
+      "name": "importGraph",
+      "dir": ".lake/packages/importGraph",
+      "inherited": true,
+      "configFile": "lakefile.toml",
+      "manifestFile": "lake-manifest.json"
+    },
+    {
+      "type": "path",
+      "scope": "",
+      "name": "mathlib",
+      "dir": ".lake/packages/mathlib",
+      "inherited": false,
+      "configFile": "lakefile.lean",
+      "manifestFile": "lake-manifest.json"
+    },
+    {
+      "type": "path",
+      "scope": "",
+      "name": "plausible",
+      "dir": ".lake/packages/plausible",
+      "inherited": true,
+      "configFile": "lakefile.toml",
+      "manifestFile": "lake-manifest.json"
+    },
+    {
+      "type": "path",
+      "scope": "",
+      "name": "proofwidgets",
+      "dir": ".lake/packages/proofwidgets",
+      "inherited": true,
+      "configFile": "lakefile.lean",
+      "manifestFile": "lake-manifest.json"
+    }
+  ],
+  "name": "gnc",
+  "lakeDir": ".lake"
+}
