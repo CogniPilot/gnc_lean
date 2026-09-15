@@ -83,3 +83,13 @@ and builds the documents and numerical experiments against these proofs.
 `.lake/`, `.direnv/`, Python caches and Nix `result*` links are ignored.
 Nix output links point to `/nix/store`; they are build artifacts, not source
 files. Keep new output links under `.lake/`, or pass `--no-link`.
+
+## License
+
+GNC for Lean is licensed under the Apache License, Version 2.0. See
+[LICENSE](LICENSE) and [NOTICE](NOTICE) for details. Copyright 2026 CogniPilot
+Foundation.
+
+The library reuses [mathlib](https://github.com/leanprover-community/mathlib4),
+which is also distributed under the Apache License, Version 2.0, as a
+dependency.
