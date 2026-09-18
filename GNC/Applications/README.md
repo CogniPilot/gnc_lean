@@ -23,6 +23,15 @@ for the application aggregate, or an individual module below.
 | [TwoFrameScalings](TwoFrameScalings.lean) | Two-frame groups with scalings |
 | [OrbitalFuel](OrbitalFuel.lean) | Orbital fuel and uncertainty |
 
+## Derivations
+
+Derivation documents behind the application proofs live in
+[docs/derivations](../../docs/derivations/README.md).
+
+| Derivation | Related application modules |
+| --- | --- |
+| [Mixed-invariant preintegration error theory](../../docs/derivations/mixed_invariant_preintegration_error_theory.pdf): exact Magnus truncation residuals on the time-extended SE2(3), the coning sufficiency bound, and the delayed-fusion error-state filter | [Preintegration](Preintegration.lean), [Magnus](Magnus.lean), [Nilpotent](Nilpotent.lean), [EquivariantFilter](EquivariantFilter.lean) |
+
 General mathematics may not import these applications. Application modules
 may reuse one another when a proof requires it. Every mathematical source
 must be exported by `GNC.All`, and every declaration is included in the
