@@ -43,6 +43,12 @@ changes during the check, and replaces a previous success report with a
 running/failed status when appropriate. The report is an attestation produced
 by build tooling; the proof terms themselves are checked by Lean.
 
+The library owns its pinned flake and its GitHub Actions workflow. CI runs
+this same command, verifies the generated report's source correspondence,
+and uploads its logs and report. Workflow files are part of the hashed
+snapshot. Separate caches preserve released dependency artifacts and project
+proof artifacts; the build and axiom audit still run on every CI invocation.
+
 Use `nix develop --command python scripts/verify.py --fresh` for an explicit
 clean verification. This isolated build starts with no project proof
 artifacts and reuses only the released dependency cache. After the complete

@@ -5,26 +5,226 @@ and control.** Every included theorem is checked by Lean's kernel under its
 stated hypotheses, with no admitted proofs or additional project axioms.
 
 The [source-hashed record](latest.json) passed on
-2026-09-15T16:47:03.269788+00:00. It covers:
+2026-09-16T08:58:13.247165+00:00. It covers:
 
-- 892 GNC modules: 891 mathematical modules and the exact-rational CLI.
-- 27,388 theorem declarations among 32,622 declarations.
-- 22,455 application theorem declarations, included in those totals.
-- 98 passing audit, release, cache and planner regression checks.
-- 1,137 source/configuration files identified by SHA-256.
+- 1194 GNC modules: 1192 mathematical modules and two executable-tool modules.
+- 32,568 theorem declarations among 39,407 declarations.
+- 27,138 application theorem declarations, included in those totals.
+- 73 passing library audit, release, cache and planner regression checks.
+- 1,214 source/configuration files identified by SHA-256, including CI workflows.
 
-All 896 project Lean files live under `GNC/`; four are verification tooling.
+All 1198 project Lean files live under `GNC/`; four are verification tooling.
 Declaration counts include generated lemmas, not just statements in papers.
 The only foundations are `propext`, `Classical.choice` and `Quot.sound`, using
-released Lean 4.29.1 and mathlib v4.29.1. The audit separately recognizes 58
+released Lean 4.29.1 and mathlib v4.29.1. The audit separately recognizes 59
 Lean-generated runtime companions.
+
+This complete audit covers the library after separating it into its own
+repository. All application proofs remain covered. Paper experiment programs
+and their numerical comparison tests now belong to the consuming papers
+repository, so their former counts are not part of the library regression
+total or source-hash inventory. The final audit reused 1191 module artifacts
+and rebuilt 3. The nonzero-initial uncertainty containment and existence
+proofs, both concrete orbital records, covariance pushforward, coordinate
+equivalence, positive semidefiniteness and deterministic-to-variance bound
+are included. `PredictionMoments` additionally checks affine mean/covariance
+propagation and every-entry covariance error bounds, including zero radii.
+`InitialUncertaintyMoments` composes those bounds with both actual orbital
+prediction certificates, all six physical outputs and Lie reconstruction
+errors. Predictor moment bounds remain explicit hypotheses; no Gaussian or
+independent-residual assumption is used. This is not a white-noise theorem.
+The Monte Carlo runs and floating covariance calculations in
+the consuming paper are empirical checks, outside this kernel claim. The released dependency cache setup
+also passed from the standalone library directory.
+The CI workflow is configured and syntax-checked locally; this record does
+not claim a hosted GitHub Actions run.
+
+`MovingTensorProjection` checks the actual derivative of a moving bilinear
+tensor projection and its discarded mixed-component bound. Idempotence
+suffices for the projected tensor to annihilate normal inputs. Taylor
+weighting, full-basis cancellation and a conditional transition-kernel
+error bound are included. The consuming paper's TDSTT2 adapter is numerical;
+this generic theorem does not certify its physical trajectories or cost.
+The module now also differentiates the synthesized low-rank query and bounds
+its position/velocity kinematic discrepancy from moving normal directions.
+`CartesianRadiusDefect` supplies a full-field Cartesian residual bound using
+the same scalar inverse-radius constraint method as the Lie construction.
+`TDSTTPolynomial` and four concrete `TDSTTData` records check the two rank-two
+factorizations, exact initial values, candidate ranges and kinematic ranges.
+`TDSTTData.Cartesian2.Prediction` now composes the complete physical
+certificate for the fitted Cartesian rank-two query: 1.591368502 m and
+0.066210187 m/s for every burn time and pointing vector in the declared
+120 s / 0.1 rad family. It constructs the nonsingular physical solution,
+identifies exact nominal initial data, and charges the delivered velocity's
+kinematic discrepancy. `SmallOffsetDefect` bounds higher gravity and scalar
+constraint products with explicit fourth-, sixth- and eighth-power growth;
+`QuadraticTimeProfile` and `ExactDegreeProduct` justify the time growth and
+finite coefficient assembly. All 32 generated checking files reproduce in
+the consuming paper's pinned Nix target. `LieRadiusQuadratic` additionally
+proves a lower-degree radius check and its growth bound; `TDSTTData.Lie2`
+now completes the physical composition at 0.000992348 m / 0.000041743 m/s.
+`TDSTTComparison` places both certificates on the same physical motions.
+`TDSTTWitness` proves Cartesian actual error above 25 cm at the explicit
+pointing vector (0.06,0.08,0) rad, while Lie is below 1 mm on the whole ball,
+and an actual-error ratio above 250 at that witness. This uses exact rational
+query evaluation and a proved Jacobian remainder, not numerical integration.
+The claim concerns these concrete fitted rank-two predictors, not arbitrary
+Cartesian algorithms or their higher-order/refined variants. These results do not verify the
+raw numerical interpolant, coefficient generator or floating evaluation.
+
+`TDSTTQuadraticObstruction` strengthens the fixed-candidate comparison to
+the entire class of quadratic Cartesian position maps in the rotation vector.
+Four admitted collinear inputs cancel every quadratic and leave a physical
+endpoint-error lower bound above 2.4 mm, after charging the Lie certificate
+and reconstruction remainder. Physical existence is proved at all witnesses.
+`PolynomialLine` derives line evaluation and degree inheritance from mathlib,
+so the obstruction covers every rank and every fitted coefficient choice.
+A one-millimetre Cartesian polynomial guarantee requires degree at least three.
+The consuming paper's cubic/quartic refinement experiment is numerical, not
+a physical certificate or complete-cost proof.
+
+`QuadraticResponseCertificate` checks the complete computed first-plus-quadratic
+response defect, including both response residuals and the Hessian mismatch,
+and its composition with a nonzero-initial physical polynomial envelope.
+`QuadraticMajorant` checks a non-iterative response-size comparison with
+an explicit gain domain; the response acceleration bounds include computed
+defects. The concrete modules below instantiate these generic results to complete
+the centered Cartesian physical certificate.
+
+`CartesianResponsePolynomial` checks the executable polynomial surrogate
+operators, coefficient-curve derivatives, uniform residual bounds, and
+finite-feature combinations. `CenteredResponseData` checks eight linear
+and 36 quadratic stored response residuals, their exact initial data, and
+weighted all-time bounds for the whole declared feature box. A separate
+pinned Nix target reproduced all 48 generated Lean files.
+`GravityUnitReferenceApproximation` checks the gradient and half-Hessian
+transfer without assuming the polynomial reference is unit length.
+`CenteredResponseReference` checks the actual sharper oscillator residual
+and its transfer to the physical nominal and varying-rate force.
+`CenteredResponseAssembly` and `CenteredResponseDefect` check the complete
+first/quadratic feature sums, their derivatives and assembled residuals.
+`CenteredResponsePhysicalOperators` checks both physical operator budgets.
+`CenteredResponseGeometry` discharges the rotation-induced forcing mismatch;
+`CenteredResponseInitial` identifies the exact midpoint initial states and
+proves their quadratic-in-angle norm bounds. `CenteredResponseBounds`
+checks the computed response sizes. `CenteredResponseKinematics` derives
+the actual candidate derivatives and full gravity defect; `RotationIsometry`
+transfers them through the exact half rotation. The actual envelope records
+check positive radius, physical gain, closure and outward display bounds.
+`CenteredResponsePrediction.physical_prediction` now proves nonsingular
+physical existence and 0.728244 mm / 0.012172 mm/s error bounds throughout
+the 120 s burn, for every attitude in the three-axis 0.1 rad ball and every
+physical motion with the prescribed midpoint initial state.
+`CenteredResponseComparison.matched_physical_certificates` explicitly
+places both completed certificates on the same physical motions.
+Its budget-order theorem compares the certified bounds, not actual errors.
+The consuming paper's prepared-query operation counts remain measurements,
+not kernel theorems or full construction/certification costs.
+
+`RotationCenteredError` checks the exact half-rotation midpoint compression,
+the centered thrust identity and a quadratic angular displacement bound.
+With an explicit positive radius floor, the initial inverse-square gravity
+Taylor remainder is bounded by a fourth-order angular expression. These
+pointwise results apply equally to Lie and Cartesian response methods.
+They do not certify the consuming paper's new sampled three-axis screen or
+its prepared-query expression counts.
+
+`LieRadiusCertificate` proves the exact scalar Gram identity, an explicit
+quadratic-inverse Jacobian residual including trigonometric tails, and a
+full-gravity defect bound using a scalar inverse-radius constraint.
+`LieRadiusFrame` connects this defect to actual inertial position and velocity
+derivatives, with Coriolis, Euler and centripetal terms retained.
+`LieRadiusApproximation` charges approximate-axis errors, inverse-cube
+omitted products and sine/cosine tails; its squared-radius bound retains
+quadratic and quartic time growth. `LieRadiusDefect` assembles a complete
+pointwise full-gravity budget and derives the candidate radius floor and
+nonnegative inverse-radius branch from its explicit candidate bounds.
+`LieRadiusModel` identifies the executable polynomial residual, actual
+candidate derivatives and normalized squared-radius error of the exact
+inertial candidate. These are generic checked results.
+
+`CoefficientNormProfile` proves coefficientwise Euclidean polynomial range
+bounds without full polynomial squaring. It applies to Cartesian and Lie
+representations alike. Six separately cached `LieRadiusData` input/range
+modules check the delivered Lie coefficients, five direct polynomial
+decompositions and their rational norm profiles. The aggregate derives
+uniform parameter bounds and three quadratic-growth bounds. The concrete
+phase and pointwise-budget composition is checked in `LieRadiusData.Bounds`;
+`LieRadiusData.Envelope` checks outward rounding, the supersolution and coarse
+closure. `LieRadiusPrediction.physical_prediction` proves existence and
+0.626 mm / 0.0212 mm/s error bounds for every specified motion, throughout
+the 120-second burn and for every allowed pointing angle. It uses the direct
+Lie/scalar residual instead of constructing a Cartesian trajectory witness.
+The earlier witness-based figures below remain valid. Numerical constructor
+operation counts belong to the consuming paper, not to this library's kernel
+theorem claim. The consuming paper's three-axis screen is not yet certified
+by this one-angle result.
+
+`BallMonomial` and `BallNormProfile` certify coefficient ranges over a full
+three-axis Euclidean attitude ball. `JacobianPolynomial` checks its explicit
+trigonometric tail and exact scalar Gram identity. `LieRadiusSpatialApproximation`
+charges the reference and reconstruction errors in the candidate radius;
+`LieRadiusFullDefect` retains the complete cubic inverse-radius factor and
+scalar constraint. These generic results are included in the audit. They
+do not certify the paper's new three-axis numerical coefficient proposal.
+`TruncatedProduct` checks bounding discarded homogeneous products before
+expanding them, and propagating existing factor errors including their product.
+`BallPolynomialEnclosure` connects these rules to executable block arithmetic,
+checked stored outputs, upward tail profiles and Euclidean vector bounds.
+Its scalar coefficient-norm theorem avoids repeated rational squaring checks.
+`DegreeProductCertificate` reassembles separately checked homogeneous
+output pieces, avoiding one monolithic retained-product calculation.
+These rules are shared by both coordinate systems.
+`LieRadiusCubicEnclosure` transfers a scalar cubic-factor enclosure to the
+full physical defect, charging both gravity terms with the joint multiplier
+while retaining the separate radius constraint. It also proves the midpoint
+skew cancellation and the contractive quadratic-skew bound.
+The generated `JointErrorData` modules now check the actual three-axis
+candidate, initial identities, full-ball ranges and complete Lie residual.
+Degreewise affine product identities retain cancellation before bounding;
+vector coefficient ranges and every discarded product are checked. The
+entire cubic-factor tail is charged once with the Euclidean joint multiplier.
+`JointErrorPolynomial` proves the executable model's semantics and physical
+defect connection; `JointResidualCertificate` composes the numeric records.
+`JointErrorReference` reuses the checked oscillator certificate after matching
+the actual coefficient lists. It proves the exact unit-radius nominal,
+position and velocity differential equations in full gravity, and spatial
+reference/force error bounds including angular acceleration.
+`SumProductCertificate` checks cancellation-preserving sums of homogeneous
+products. `JointRadiusCertificate` derives the exact scalar Gram factorization;
+the concrete `JointErrorData.Radius` and `Constraint` modules check every
+retained coefficient, ball range, radius tail and inverse-radius constraint.
+`JointErrorKinematics` proves the exact reconstruction derivatives.
+`JointErrorData.Ranges` derives uniform candidate bounds from checked profiles.
+`JointErrorPhysicalDefect` combines all concrete records into the full nonlinear
+gravity/thrust defect on the complete attitude ball and burn interval.
+`JointErrorData.Budget` bounds the actual normalized physical defect with a
+rational time profile. `JointErrorData.Envelope` checks outward rounding,
+the supersolution, positive-radius closure and SI display bounds.
+`CandidateOrbitExistence` supplies a reusable physical existence theorem
+from a candidate and its defect. `JointErrorInitialState` identifies the
+stored initial data with the physical midpoint family, including zero rotation.
+`JointErrorPrediction.physical_prediction` completes the all-time,
+whole-ball trajectory certificate: 2.916033 mm and 0.052027779 mm/s over
+120 seconds for the stated midpoint family with rotation norm at most
+0.1 rad. `motion_initial_midpoint` connects its physical motions to that
+family. The matched Cartesian certificate remains a separate paper obligation.
+
+New large residual records use Lean's exact `mkRat` constructor to avoid slow
+elaboration of overloaded divisions. Kernel arithmetic checks are unchanged.
+Lake allocates 64 MiB of thread stack for the largest norm-profile records;
+the resource flag preserves proof-content cache keys. These are verification
+engineering changes, not additional axioms or a certified runtime speedup.
 
 `StateTransitionTensor` and `MixedStateTransitionTensor` check the exact
 linear transition, vanishing of every higher initial-error derivative,
 reconstruction of actual matched mixed-invariant trajectories, and restriction
 to the Lie algebra under the stated geometric hypotheses. A smooth residual
 supplies all higher vector-field derivatives. Physical reconstruction needs
-a valid Lipschitz bound and region membership.
+a valid Lipschitz bound and region membership. The reconstruction tensor
+identity and a nonzero directional witness are checked using mathlib's
+higher chain rule. These use initial algebra-error parameters and do not
+imply that every Cartesian state transition has nonzero higher derivatives.
 
 The short-burn orbital Lie-STT pipeline now has a complete physical
 certificate with exact factored output. `LieErrorReconstruction` proves that
@@ -38,8 +238,9 @@ comparators are checked and exported. The latter win this short-burn test.
 The original long-burn angle-jet screen remains numerical diagnostics.
 The Nix benchmark reproduces all records, optimized FLOPs and separate
 rational-proposer work. These counts do not verify compiler cost or final
-binary64 query evaluation. A certificate constructor operating entirely in
-Lie coordinates without the offline expanded witness remains future work.
+binary64 query evaluation. The direct one-angle constructor described above now avoids that witness;
+the all-axis concrete certificate is also complete; the matched complete-cost
+comparison remains unfinished.
 
 `LieGravityPullback` checks the exact finite-angle thrust identity, the radial
 gravity reduction and its derivation from actual physical position/velocity

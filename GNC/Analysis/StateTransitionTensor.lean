@@ -30,6 +30,39 @@ theorem residual_higher (L : E →L[ℝ] F) (r : E → F) (n : ℕ) (x : E)
     iteratedFDeriv ℝ (n+2) (fun y => L y+r y) x = iteratedFDeriv ℝ (n+2) r x := by
   rw [fun_iteratedFDeriv_add_apply L.contDiff.contDiffAt hr,linear_higher,zero_add]
 
+/-- Exact reconstruction can create higher output tensors even when the
+transition in error coordinates is linear. This is mathlib's higher chain
+rule specialized to the physical reconstruction of an error transition. -/
+theorem reconstruction_tensor (L : E →L[ℝ] E) (reconstruct : E → F)
+    (n : ℕ) (hR : ContDiff ℝ n reconstruct) (x : E) :
+    iteratedFDeriv ℝ n (reconstruct ∘ L) x =
+      (iteratedFDeriv ℝ n reconstruct (L x)).compContinuousLinearMap
+        (fun _ => L) :=
+  L.iteratedFDeriv_comp_right hR x (le_refl _)
+
+/-- A directional form of the exact reconstruction tensor identity.
+The directions are initial errors, not time derivatives. -/
+theorem reconstruction_tensor_apply (L : E →L[ℝ] E) (reconstruct : E → F)
+    (n : ℕ) (hR : ContDiff ℝ n reconstruct) (x : E) (v : Fin n → E) :
+    iteratedFDeriv ℝ n (reconstruct ∘ L) x v =
+      iteratedFDeriv ℝ n reconstruct (L x) (fun i => L (v i)) := by
+  rw [reconstruction_tensor L reconstruct n hR x]
+  rfl
+
+/-- Nonzero reconstruction curvature in reached directions gives a nonzero
+physical output tensor despite the vanishing higher tensors of the linear
+transition. This supplies an explicit witness, not a universal curvature
+or computational-cost claim. -/
+theorem reconstruction_higher_ne_zero (L : E →L[ℝ] E) (reconstruct : E → F)
+    (n : ℕ) (hR : ContDiff ℝ (n+2) reconstruct) (x : E)
+    (v : Fin (n+2) → E)
+    (hv : iteratedFDeriv ℝ (n+2) reconstruct (L x) (fun i => L (v i)) ≠ 0) :
+    iteratedFDeriv ℝ (n+2) (reconstruct ∘ L) x ≠ 0 := by
+  intro h
+  apply hv
+  rw [← reconstruction_tensor_apply L reconstruct (n+2) hR x v, h]
+  rfl
+
 omit [NormedSpace ℝ E] [NormedSpace ℝ F] in
 /-- Nonlinear physical reconstruction can preserve an algebra-space
 certificate. Its distortion and both chart memberships must be supplied. -/

@@ -1,0 +1,57 @@
+name: Verify GNC
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+      - uses: cachix/install-nix-action@b85815f71a6de0ddee80b8a80a98d43f4bcc66c7 # v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - name: Restore released dependency artifacts
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: |
+            .lake/packages
+            .lake/mathlib-cache
+          key: mathlib-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('flake.lock', 'lean-toolchain', 'scripts/setup.py') }}
+      - name: Restore project proof artifacts
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: .lake/build
+          key: gnc-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('flake.lock', 'lean-toolchain', 'lakefile.toml') }}-${{ github.sha }}
+          restore-keys: |
+            gnc-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('flake.lock', 'lean-toolchain', 'lakefile.toml') }}-
+      - name: Check the pinned flake
+        run: nix flake check --no-build
+      - name: Materialize pinned sources and fetch released mathlib proofs
+        run: nix develop --command gnc-cache
+      - name: Build every module and audit proofs, dependencies, and regression checks
+        run: nix develop --command python scripts/verify.py
+      - name: Check report against this exact source snapshot
+        run: nix develop --command python scripts/verify.py --check-report .lake/verification/report.json
+      - name: Upload verification evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: gnc-verification-${{ github.sha }}
+          path: .lake/verification/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30

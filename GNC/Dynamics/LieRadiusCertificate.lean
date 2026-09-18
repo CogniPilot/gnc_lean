@@ -1,5 +1,6 @@
 import GNC.Dynamics.LieErrorReconstruction
 import GNC.Dynamics.InverseRadius
+import GNC.Lie.Adjoint
 
 /-! Scalar radius certificates without expanding Cartesian translation jets.
 
@@ -22,7 +23,8 @@ theorem jacobianInverseQuadratic_bound (φ v : Vec3) :
   have h2 := (cross_enorm_le φ (φ ⨯₃ v)).trans
     (mul_le_mul_of_nonneg_left h1 (enorm_nonneg φ))
   unfold jacobianInverseQuadratic
-  have ha := (enorm_add_le _ _).trans (add_le_add
+  have ha := (enorm_add_le (v-(1/2:ℝ) • (φ ⨯₃ v))
+    ((1/12:ℝ) • (φ ⨯₃ (φ ⨯₃ v)))).trans (add_le_add
     (enorm_add_le v (-((1/2:ℝ) • (φ ⨯₃ v)))) le_rfl)
   simp only [sub_eq_add_neg,enorm_neg,enorm_smul] at *
   norm_num at ha
@@ -40,10 +42,8 @@ theorem inverseQuadratic_polynomial_residual (k v : Vec3) (hk : k ⬝ᵥ k=1) (�
   have h3 : k ⨯₃ (k ⨯₃ (k ⨯₃ v))= -(k ⨯₃ v) := by
     rw [Axis.cross_sq k v hk]
     simp only [map_sub,Axis.cross_axial,zero_sub]
-  have h4 : k ⨯₃ (k ⨯₃ (k ⨯₃ (k ⨯₃ v)))= -(k ⨯₃ (k ⨯₃ v)) := by
-    rw [h3,map_neg]
   simp only [polynomialTranslation,jacobianInverseQuadratic,map_smul,LinearMap.smul_apply,
-    smul_smul,map_add,map_sub,LinearMap.add_apply,LinearMap.sub_apply,h3,h4,map_neg]
+    smul_smul,map_add,map_sub,h3,map_neg]
   unfold inverseQuadraticOdd inverseQuadraticEven OcticPointing.sine OcticPointing.cosineLoss
   module
 
@@ -57,12 +57,71 @@ theorem inverseQuadratic_coefficients_bound (θ : ℝ) :
     |inverseQuadraticOdd θ|+|inverseQuadraticEven θ|≤
       |θ|^4/720+|θ|^5/1440+|θ|^6/5040+|θ|^7/24192+|θ|^8/241920+|θ|^9/483840 := by
   have h1 := (abs_add_le (θ^5/1440-θ^7/24192) (θ^9/483840)).trans
-    (add_le_add (abs_sub_le (θ^5/1440) (θ^7/24192)) le_rfl)
-  have h2 := (abs_sub_le (-θ^4/720+θ^6/5040) (θ^8/241920)).trans
+    (add_le_add (abs_sub (θ^5/1440) (θ^7/24192)) le_rfl)
+  have h2 := (abs_sub (-θ^4/720+θ^6/5040) (θ^8/241920)).trans
     (add_le_add (abs_add_le (-θ^4/720) (θ^6/5040)) le_rfl)
   dsimp [inverseQuadraticOdd,inverseQuadraticEven]
   norm_num [abs_div,abs_pow] at h1 h2
   nlinarith
+
+theorem inverseQuadraticBudget_nonneg {x : ℝ} (hx : 0≤x) :
+    0≤ inverseQuadraticBudget x := by unfold inverseQuadraticBudget; positivity
+
+theorem inverseQuadraticBudget_mono {x y : ℝ} (hx : 0≤x) (hxy : x≤y) :
+    inverseQuadraticBudget x≤ inverseQuadraticBudget y := by
+  have hy := hx.trans hxy
+  unfold inverseQuadraticBudget
+  gcongr
+
+/-- The exact Jacobian, not only its polynomial truncation, has this residual.
+The proof cancels a nonzero angle; the zero-angle case is checked separately. -/
+theorem jacobianInverseQuadratic_residual_bound (k v : Vec3)
+    (hk : k ⬝ᵥ k=1) (θ : ℝ) :
+    enorm (Jacobian.leftAt (θ • k) (jacobianInverseQuadratic (θ • k) v)-v)≤
+      inverseQuadraticBudget |θ| * enorm v := by
+  by_cases hz : θ=0
+  · subst θ
+    simp [Jacobian.leftAt,jacobianInverseQuadratic,inverseQuadraticBudget]
+    exact le_of_eq ((enorm_eq_zero_iff _).mpr rfl)
+  have hklen := Gravity.unit_enorm k hk
+  have hcross : enorm (k ⨯₃ v)≤enorm v := by
+    simpa [hklen] using cross_enorm_le k v
+  have hcross2 : enorm (k ⨯₃ (k ⨯₃ v))≤enorm v := by
+    have h : enorm (k ⨯₃ (k ⨯₃ v))≤enorm (k ⨯₃ v) := by
+      simpa [hklen] using cross_enorm_le k (k ⨯₃ v)
+    exact h.trans hcross
+  have hp := jacobianInverseQuadratic_bound (θ • k) v
+  rw [enorm_smul,hklen,mul_one] at hp
+  have htail := factoredTranslation_polynomial_bound k
+    (jacobianInverseQuadratic (θ • k) v) hk θ
+  have hpoly : enorm (polynomialTranslation k (jacobianInverseQuadratic (θ • k) v) θ-θ • v)≤
+      |θ| * ((|inverseQuadraticOdd θ|+|inverseQuadraticEven θ|)*enorm v) := by
+    rw [inverseQuadratic_polynomial_residual k v hk θ,enorm_smul]
+    apply mul_le_mul_of_nonneg_left _ (abs_nonneg θ)
+    apply (enorm_add_le _ _).trans
+    rw [enorm_smul,enorm_smul,add_mul]
+    exact add_le_add
+      (mul_le_mul_of_nonneg_left hcross (abs_nonneg _))
+      (mul_le_mul_of_nonneg_left hcross2 (abs_nonneg _))
+  have htriangle := (enorm_add_le
+    (factoredTranslation k (jacobianInverseQuadratic (θ • k) v) θ-
+      polynomialTranslation k (jacobianInverseQuadratic (θ • k) v) θ)
+    (polynomialTranslation k (jacobianInverseQuadratic (θ • k) v) θ-θ • v)).trans
+      (add_le_add htail hpoly)
+  rw [sub_add_sub_cancel,factoredTranslation_eq k _ hk θ,Jacobian.leftAt_smul,
+    ←smul_sub,enorm_smul] at htriangle
+  have hcoeff := inverseQuadratic_coefficients_bound θ
+  have hupper := add_le_add
+    (mul_le_mul_of_nonneg_left hp (by positivity : 0≤|θ|^9/362880+|θ|^10/3628800))
+    (mul_le_mul_of_nonneg_left
+      (mul_le_mul_of_nonneg_right hcoeff (enorm_nonneg v)) (abs_nonneg θ))
+  refine le_of_mul_le_mul_left ?_ (abs_pos.mpr hz)
+  exact htriangle.trans (hupper.trans_eq (by unfold inverseQuadraticBudget; ring))
+
+/-- Equivariance of the exact translation Jacobian under a spatial rotation. -/
+theorem leftAt_rotation_equivariant (R : SO3) (φ v : Vec3) :
+    Jacobian.leftAt (rotate R φ) (rotate R v)=rotate R (Jacobian.leftAt φ v) := by
+  simp only [Jacobian.leftAt,rotate_enorm,rotate_add,rotate_smul,rotate_cross]
 
 /-- Exact Gram reduction of the factored exponential translation.
 No small-angle assumption or series truncation is used. -/

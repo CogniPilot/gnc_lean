@@ -38,7 +38,9 @@ def structure_errors(root):
             if (module.startswith('GNC.') and not module.startswith('GNC.Tools.')
                     and dependency.startswith('GNC.Tools.')):
                 errors.append(f'Mathematics imports executable tooling: {module} -> {dependency}')
-            if (module.startswith('GNC.') and module != 'GNC.All' and not (module == 'GNC.Applications' or module.startswith('GNC.Applications.'))
+            if (module.startswith('GNC.') and module != 'GNC.All'
+                    and not module.startswith('GNC.Tools.')
+                    and not (module == 'GNC.Applications' or module.startswith('GNC.Applications.'))
                     and dependency.startswith('GNC.Applications')):
                 errors.append(f'Core imports an application: {module} -> {dependency}')
     visiting, seen = set(), set()

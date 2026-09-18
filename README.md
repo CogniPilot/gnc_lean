@@ -61,6 +61,20 @@ nix develop --command python scripts/verify.py --check-report .lake/verification
 
 The second command checks snapshot correspondence; it does not rerun proofs.
 
+## Continuous integration
+
+The library's [GitHub Actions workflow](.github/workflows/verify.yml) runs on
+pushes, pull requests and manual dispatch. It uses this repository's own
+flake, fetches the pinned release's mathlib artifacts, and runs the complete
+verification command above. It then checks that the generated report matches
+the exact source snapshot and uploads the report and logs, including on failure.
+
+Dependency artifacts and project proof artifacts have separate caches. Lake
+checks source and import changes before reusing project artifacts; a cache hit
+does not skip the build or the axiom audit. The workflow pins action revisions
+and requires no publishing credentials. A hosted CI pass is a separate piece
+of evidence from a locally generated verification record.
+
 ## Applications and papers
 
 Notable results and limits are described in the [library overview](GNC/README.md),

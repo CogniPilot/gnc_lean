@@ -152,6 +152,8 @@ def source_hashes(root=ROOT):
                 "docs/VERIFICATION.md"]]
     sources += list((root / "nix").rglob("*.nix"))
     sources += list((root / "nix").rglob("*.patch"))
+    sources += [p for p in (root / ".github/workflows").rglob("*")
+                if p.suffix in {".yml", ".yaml"}]
     return {str(p.relative_to(root)): sha256(p.read_bytes()).hexdigest()
             for p in sorted(sources)}
 

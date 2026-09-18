@@ -58,6 +58,18 @@ class ReleaseTests(TestCase):
         with self.assertRaisesRegex(RuntimeError, "changed:.*lean.nix"):
             check_report(self.record, self.root)
 
+    def test_ci_workflow_is_part_of_snapshot(self):
+        workflow = self.root / '.github/workflows/verify.yml'
+        workflow.parent.mkdir(parents=True)
+        workflow.write_text('name: verify\n')
+        with self.assertRaisesRegex(RuntimeError, 'added:.*verify.yml'):
+            check_report(self.record, self.root)
+        self.record.write_text(json.dumps({'status': 'passed', 'checked_at_utc': 'fixture',
+                                           'source_sha256': source_hashes(self.root)}))
+        workflow.write_text('name: changed\n')
+        with self.assertRaisesRegex(RuntimeError, 'changed:.*verify.yml'):
+            check_report(self.record, self.root)
+
     def test_failed_report(self):
         report = json.loads(self.record.read_text())
         report["status"] = "failed"

@@ -1,5 +1,6 @@
 import GNC.Planning.Hermite
 import Lean.Data.Json.FromToJson
+import GNC.Tools.InitialUncertaintyExport
 
 /-! Exact rational Dubins-polynomial seed and nominal-distance derivatives.
 Run inside the pinned flake:
@@ -79,6 +80,7 @@ private def hermiteReport (args : List String) : Except String Lean.Json := do
 
 private def report (args : List String) : Except String Lean.Json :=
   match args with
+  | ["orbit-uncertainty"] => .ok GNC.Tools.InitialUncertaintyExport.payload
   | "hermite" :: rest => hermiteReport rest
   | _ => seedReport args
 
