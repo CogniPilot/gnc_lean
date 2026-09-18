@@ -168,6 +168,15 @@ import GNC.Magnus.MagnusJet
 import GNC.Magnus.GaussError
 import GNC.Magnus.GaussSmoothRemainder
 import GNC.Preintegration.ClosedForm
+import GNC.Magnus.FOHIncrement
+import GNC.Magnus.LeftConventionJet
+import GNC.Magnus.ResidualBound
+import GNC.Magnus.CenteredHold
+import GNC.Magnus.SimplexMoments
+import GNC.Magnus.ExponentialPerturbation
+import GNC.Magnus.ReapplicationRemainder
+import GNC.Analysis.HoldInterpolation
+import GNC.Analysis.FlowSensitivity
 import GNC.Dynamics.AngularRateError
 import GNC.Control.CoupledTube
 import GNC.Control.PIDTube

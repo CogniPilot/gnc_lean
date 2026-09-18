@@ -15,6 +15,7 @@ for the application aggregate, or an individual module below.
 | [MotorBurn](MotorBurn/Bounds.lean) | Full-gravity, variable-mass burn/coast input enclosures |
 | [Rendezvous](Rendezvous.lean) | Two-impulse planning |
 | [Preintegration](Preintegration.lean) | Closed-form preintegration |
+| [PreintegrationErrorTheory](PreintegrationErrorTheory.lean) | Exact error theory for mixed-invariant preintegration: FOH and centered-hold exponents, truncation residuals, interpolation and flow-sensitivity bounds, reapplication remainder (ledger in [docs/derivations](../../docs/derivations/README.md)) |
 | [Nilpotent](Nilpotent.lean) | Mixed nilpotent summation |
 | [Magnus](Magnus.lean) | Magnus extension |
 | [Backstepping](Backstepping.lean) | Aircraft control |

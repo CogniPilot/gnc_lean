@@ -13,6 +13,7 @@ import GNC.Applications.ReachabilityReview
 import GNC.Applications.LogLinOrbit
 import GNC.Applications.OrbitalComparison.PoweredCircle
 import GNC.Applications.Preintegration
+import GNC.Applications.PreintegrationErrorTheory
 import GNC.Applications.Nilpotent
 import GNC.Applications.Magnus
 import GNC.Applications.Backstepping
