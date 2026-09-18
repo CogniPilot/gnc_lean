@@ -205,6 +205,8 @@ import GNC.Magnus.ExponentialPerturbation
 import GNC.Magnus.ReapplicationRemainder
 import GNC.Analysis.HoldInterpolation
 import GNC.Analysis.FlowSensitivity
+import GNC.Analysis.InitialPolynomialSupersolution
+import GNC.Dynamics.PlanarCoastDefect
 import GNC.Dynamics.AngularRateError
 import GNC.Control.CoupledTube
 import GNC.Control.PIDTube

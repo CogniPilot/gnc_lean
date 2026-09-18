@@ -14,6 +14,7 @@ import GNC.Applications.LogLinOrbit
 import GNC.Applications.OrbitalComparison.PoweredCircle
 import GNC.Applications.Preintegration
 import GNC.Applications.PreintegrationErrorTheory
+import GNC.Applications.CertifiedCoast.Orbit
 import GNC.Applications.DroneCertificate
 import GNC.Applications.DragCertificate
 import GNC.Applications.FlatSpaceSpread
