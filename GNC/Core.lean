@@ -367,3 +367,6 @@ import GNC.Analysis.ParameterPolynomialL1
 import GNC.Estimation.Eskf.Interface
 import GNC.Estimation.Eskf.Sampling
 import GNC.Estimation.Eskf.Bounds
+import GNC.Analysis.TransportedCertificate
+import GNC.Dynamics.PlanarCoastCurvature
+import GNC.Magnus.OrbitalInteraction
