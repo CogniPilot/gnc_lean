@@ -370,3 +370,6 @@ import GNC.Estimation.Eskf.Bounds
 import GNC.Analysis.TransportedCertificate
 import GNC.Dynamics.PlanarCoastCurvature
 import GNC.Magnus.OrbitalInteraction
+import GNC.Dynamics.ReciprocalMass
+import GNC.Magnus.MassDepletionHold
+import GNC.Dynamics.PlanarBurnDefect
