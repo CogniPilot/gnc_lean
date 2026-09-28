@@ -31,6 +31,17 @@ open GNC.Applications.CertifiedCoast.Curvature (evalMatQ realMat_hasDerivAt real
   frobVel_velCols act_eq act_continuous join2_continuous pack_continuous acc_continuous join2_sub
   Amat_sub_Ahat_row0 Amat_sub_Ahat_row1 frob_Amat_sub_Ahat ev_ratEval)
 
+/-! ### Rational literals
+
+The certificate data are written with these constructors so that each large
+rational is built from two natural number literals. -/
+
+/-- The rational `n / d`. -/
+def qp (n d : ℕ) : ℚ := mkRat n d
+
+/-- The rational `-(n / d)`. -/
+def qn (n d : ℕ) : ℚ := -mkRat n d
+
 /-! ### Time clamping -/
 
 /-- The time clamped to `[0, h]`. -/
@@ -57,6 +68,9 @@ structure BurnStep where
   epsI : ℚ
   /-- Bound of `sup ‖H' + H Â‖`. -/
   epsH : ℚ
+  /-- Split of `epsH²` between the position rows and the velocity rows of the
+  residual `H' + H Â`. -/
+  epsHa : ℚ
   /-- Bound of `sup ‖Ψ‖`. -/
   gSup : ℚ
   /-- Bound of `sup ‖H‖`. -/
@@ -77,6 +91,10 @@ structure BurnStep where
   Ein : ℚ
   /-- Small-denominator upper bound of the burn forcing constant `Ftot`. -/
   Fb : ℚ
+  /-- Small-denominator upper bound of the nominal defect `Fx`. -/
+  FxB : ℚ
+  /-- Small-denominator upper bound of the sensitivity defect `Fg`. -/
+  FgB : ℚ
   /-- Small-denominator upper bound of `3 / (ρmin - M - α Gp)⁴`. -/
   KRb : ℚ
   /-- Exact rational evaluation of the transition candidate at the endpoint. -/
@@ -119,10 +137,10 @@ def cc (r : BurnStep) : CurvatureCandidate :=
 /-- The remainder constant of `error_dynamics_burn` on the tube. -/
 def kRcst (r : BurnStep) : ℚ := 3 / (r.bc.rhoMin - r.M - r.bc.alpha * r.bc.Gp) ^ 4
 
-/-- The burn forcing constant `Ftot` with the remainder constant replaced by
-its bound `KRb`. -/
+/-- The burn forcing constant `Ftot` with the defects and the remainder
+constant replaced by their bounds `FxB`, `FgB`, `KRb`. -/
 def FtotB (r : BurnStep) : ℚ :=
-  r.bc.Fx + r.bc.alpha * r.bc.Fg + r.bc.Fmis + r.KRb * r.bc.alpha ^ 2 * r.bc.Gp ^ 2
+  r.FxB + r.bc.alpha * r.FgB + r.bc.Fmis + r.KRb * r.bc.alpha ^ 2 * r.bc.Gp ^ 2
     + 2 * r.KRb * r.bc.alpha * r.bc.Gp * r.M
 
 /-- The decidable rational hypotheses of one certified step: the burn and
@@ -135,9 +153,68 @@ def Valid (r : BurnStep) : Prop :=
   r.Pev = evalMatQ r.G r.bc.h ∧ 0 ≤ r.dX ∧ 0 ≤ r.dG ∧ r.d = r.dX + r.bc.alpha * r.dG ∧
   0 ≤ r.KRb ∧ r.kRcst ≤ r.KRb ∧ 0 ≤ r.Fb ∧ r.FtotB ≤ r.Fb ∧
   r.gSup * (r.Ein + r.bc.h * (r.kVloc * (r.KRb * r.M ^ 2 + r.Fb + r.epsA * r.M) + r.epsH * r.M))
-    < (1 - r.epsI) * r.M
+    < (1 - r.epsI) * r.M ∧
+  r.bc.Fx ≤ r.FxB ∧ r.bc.Fg ≤ r.FgB
 
 instance (r : BurnStep) : Decidable r.Valid := by unfold Valid; infer_instance
+
+/-! ### The validity check split into kernel-sized parts -/
+
+/-- The clauses of `cc.Valid` other than the two residual sums. -/
+def CCRest (r : BurnStep) : Prop :=
+  r.bc.toCandidate.Valid ∧ 0 < r.bc.rhoMin ∧ r.M < r.bc.rhoMin ∧ 0 ≤ r.M ∧
+  (∀ i j, (r.G i j).headI = if i = j then (1:ℚ) else 0) ∧ 0 ≤ r.epsI ∧
+  0 ≤ r.gSup ∧ matSumSq r.G r.bc.h ≤ r.gSup ^ 2 ∧
+  0 ≤ r.hSup ∧ matSumSq r.cc.H r.bc.h ≤ r.hSup ^ 2 ∧ 0 ≤ r.epsH ∧
+  0 ≤ r.kVloc ∧ matSumSq (velCols r.cc.H) r.bc.h ≤ r.kVloc ^ 2 ∧
+  0 ≤ r.epsA ∧ GNC.PlanarCoast.epsA r.bc.toCandidate ≤ r.epsA
+
+instance (r : BurnStep) : Decidable r.CCRest := by unfold CCRest; infer_instance
+
+/-- The residual sum of `1 - Ψ H`. -/
+def ResI (r : BurnStep) : Prop := matSumSq r.cc.residI r.bc.h ≤ r.epsI ^ 2
+instance (r : BurnStep) : Decidable r.ResI := by unfold ResI; infer_instance
+
+/-- The residual sum of `H' + H Â` on the position rows. -/
+def ResHa (r : BurnStep) : Prop :=
+  GNC.Applications.CertifiedCoast.Curvature.matSumSqRows r.cc.residH r.bc.h {0, 1} ≤ r.epsHa
+instance (r : BurnStep) : Decidable r.ResHa := by unfold ResHa; infer_instance
+
+/-- The residual sum of `H' + H Â` on the velocity rows. -/
+def ResHb (r : BurnStep) : Prop :=
+  GNC.Applications.CertifiedCoast.Curvature.matSumSqRows r.cc.residH r.bc.h {2, 3}
+    ≤ r.epsH ^ 2 - r.epsHa
+instance (r : BurnStep) : Decidable r.ResHb := by unfold ResHb; infer_instance
+
+/-- The coefficient-sum Frobenius square splits into the position rows and the
+velocity rows. -/
+theorem matSumSq_split (P : PolyMat) (h : ℚ) :
+    matSumSq P h = GNC.Applications.CertifiedCoast.Curvature.matSumSqRows P h {0, 1}
+      + GNC.Applications.CertifiedCoast.Curvature.matSumSqRows P h {2, 3} := by
+  simp only [matSumSq, GNC.Applications.CertifiedCoast.Curvature.matSumSqRows, Fin.sum_univ_four]
+  rw [Finset.sum_pair (by decide), Finset.sum_pair (by decide)]
+  ring
+
+/-- The step-specific clauses of `Valid`: tube geometry, endpoint evaluation,
+handoff combination, small bounds and the tube closure. -/
+def Small (r : BurnStep) : Prop :=
+  r.epsI < 1 ∧ 0 ≤ r.M ∧
+  r.M + r.bc.alpha * r.bc.Gp < r.bc.rhoMin ∧ 0 ≤ r.Ein ∧ r.Ein < r.M ∧
+  r.Pev = evalMatQ r.G r.bc.h ∧ 0 ≤ r.dX ∧ 0 ≤ r.dG ∧ r.d = r.dX + r.bc.alpha * r.dG ∧
+  0 ≤ r.KRb ∧ r.kRcst ≤ r.KRb ∧ 0 ≤ r.Fb ∧ r.FtotB ≤ r.Fb ∧
+  r.gSup * (r.Ein + r.bc.h * (r.kVloc * (r.KRb * r.M ^ 2 + r.Fb + r.epsA * r.M) + r.epsH * r.M))
+    < (1 - r.epsI) * r.M
+
+instance (r : BurnStep) : Decidable r.Small := by unfold Small; infer_instance
+
+theorem valid_of_parts {r : BurnStep} (hbc : r.bc.Valid) (hcc : r.CCRest) (hI : r.ResI)
+    (hHa : r.ResHa) (hHb : r.ResHb) (hFx : r.bc.Fx ≤ r.FxB) (hFg : r.bc.Fg ≤ r.FgB) (hs : r.Small) : r.Valid := by
+  have hH : matSumSq r.cc.residH r.bc.h ≤ r.epsH ^ 2 := by
+    rw [matSumSq_split]; unfold ResHa at hHa; unfold ResHb at hHb; linarith
+  obtain ⟨c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15⟩ := hcc
+  obtain ⟨s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14⟩ := hs
+  exact ⟨hbc, ⟨c1, c2, c3, c4, c5, c6, hI, c7, c8, c9, c10, c11, hH, c12, c13, c14, c15⟩,
+    s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, hFx, hFg⟩
 
 /-! ### Curves of the transported error dynamics -/
 
@@ -282,7 +359,7 @@ theorem nfC_bound (r : BurnStep) (hr : r.Valid) {Q V : ℝ → E2} {δ : ℝ}
     (hV : HasDerivAt V (Gravity.field 1 (Q s) + r.bc.thrustAcc δ s) s)
     (hmem : ‖r.efC Q V δ s‖ ≤ (r.M : ℝ)) :
     ‖r.nfC Q V δ s‖ ≤ (r.KRb : ℝ) * ‖r.efC Q V δ s‖ ^ 2 + (r.Fb : ℝ) := by
-  obtain ⟨hbc, _, _, hM0q, hMα, _, _, _, _, _, _, _, hkR, _, hFt, _⟩ := hr
+  obtain ⟨hbc, _, _, hM0q, hMα, _, _, _, _, _, _, _, hkR, _, hFt, _, hFx, hFg⟩ := hr
   have hcond : (r.M : ℝ) + (r.bc.alpha : ℝ) * (r.bc.Gp : ℝ) < (r.bc.rhoMin : ℝ) := by
     exact_mod_cast hMα
   have hed := (BurnCandidate.error_dynamics_burn r.bc hbc hs hδ hcond hQ hV hmem).2.2.2
@@ -297,7 +374,10 @@ theorem nfC_bound (r : BurnStep) (hr : r.Valid) {Q V : ℝ → E2} {δ : ℝ}
   have hG : (0 : ℝ) ≤ (r.bc.Gp : ℝ) := by exact_mod_cast BurnCandidate.Gp_nonneg r.bc hbc
   have hM : (0 : ℝ) ≤ (r.M : ℝ) := by exact_mod_cast hM0q
   have hFtR : (r.FtotB : ℝ) ≤ (r.Fb : ℝ) := by exact_mod_cast hFt
-  have hFtB : (r.FtotB : ℝ) = (r.bc.Fx : ℝ) + (r.bc.alpha : ℝ) * (r.bc.Fg : ℝ) + (r.bc.Fmis : ℝ)
+  have hFxR : (r.bc.Fx : ℝ) ≤ (r.FxB : ℝ) := by exact_mod_cast hFx
+  have hFgR : (r.bc.alpha : ℝ) * (r.bc.Fg : ℝ) ≤ (r.bc.alpha : ℝ) * (r.FgB : ℝ) :=
+    mul_le_mul_of_nonneg_left (by exact_mod_cast hFg) hα
+  have hFtB : (r.FtotB : ℝ) = (r.FxB : ℝ) + (r.bc.alpha : ℝ) * (r.FgB : ℝ) + (r.bc.Fmis : ℝ)
       + (r.KRb : ℝ) * (r.bc.alpha : ℝ) ^ 2 * (r.bc.Gp : ℝ) ^ 2
       + 2 * (r.KRb : ℝ) * (r.bc.alpha : ℝ) * (r.bc.Gp : ℝ) * (r.M : ℝ) := by
     rw [FtotB]; push_cast; ring
@@ -329,7 +409,7 @@ theorem tube_sound (r : BurnStep) (hr : r.Valid) {δ : ℝ} (hδ : |δ| ≤ (r.b
     (hE0 : ‖BurnCandidate.dev r.bc Q V δ 0‖ ≤ (r.Ein : ℝ)) :
     ∀ t ∈ Icc (0 : ℝ) (r.bc.h : ℝ), ‖BurnCandidate.dev r.bc Q V δ t‖ < (r.M : ℝ) := by
   have hr' := hr
-  obtain ⟨hbc, hcc, hεI1q, hM0q, _, _, hEinM, _, _, _, _, hKRb0, _, hFb0, _, htube⟩ := hr'
+  obtain ⟨hbc, hcc, hεI1q, hM0q, _, _, hEinM, _, _, _, _, hKRb0, _, hFb0, _, htube, _⟩ := hr'
   have hM0 : (0 : ℝ) ≤ (r.M : ℝ) := by exact_mod_cast hM0q
   have hK0 : (0 : ℝ) ≤ (r.KRb : ℝ) := by exact_mod_cast hKRb0
   have hF0 : (0 : ℝ) ≤ (r.Fb : ℝ) := by exact_mod_cast hFb0
