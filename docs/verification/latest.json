@@ -1,7 +1,7 @@
 {
   "schema_version": 5,
   "status": "passed",
-  "checked_at_utc": "2026-09-30T15:21:40.442524+00:00",
+  "checked_at_utc": "2026-09-30T15:51:31.040467+00:00",
   "lean_toolchain": "leanprover/lean4:v4.29.1",
   "lean_binary": "/nix/store/19vi5pd27jl8ng6awswallrkv8kw1rih-lean-official-4.29.1/bin/lean",
   "library_build": {
@@ -1670,10 +1670,10 @@
       "GNC.Tools.InitialUncertaintyExport",
       "GNC.Tools.Planner"
     ],
-    "project_declarations": 52708,
+    "project_declarations": 52713,
     "namespace_only_declarations": 0,
-    "library_theorem_declarations": 42962,
-    "library_declarations": 52708,
+    "library_theorem_declarations": 42967,
+    "library_declarations": 52713,
     "compiler_runtime_companions": 78,
     "axioms": [
       "Classical.choice",
@@ -1921,7 +1921,7 @@
     "GNC/Analysis/TransportedError.lean": "94b2f67c5ee994fc70bca9cc19a5243b08c503675565643da59d0c80eeac5f62",
     "GNC/Analysis/TrigonometricPolynomial.lean": "d46d268d80740e10c2e9541ff6c35772ad4be482fa55a9d6ac9a70540ee47d2b",
     "GNC/Analysis/TrigonometricPolynomial24.lean": "a3fbd77d343398685e36c0f8e1ee53a2f7552f559a8acb7984581d53ccd028fe",
-    "GNC/Analysis/TrigonometricRemainder.lean": "9c882c2c602d2bf8cf8a82d6c35f98b361069b30f54a942fd71c27e6d5f8a653",
+    "GNC/Analysis/TrigonometricRemainder.lean": "01e03511f96c5ed0f9e0e5efd62efce8e9d4012ded06f2e1a2713f36999ba6e4",
     "GNC/Analysis/TruncatedProduct.lean": "4c474458a5427e53764db3fd82e743cea4cd80beb38c66915adb67305b93c5a0",
     "GNC/Analysis/UncertaintyTruncation.lean": "ed878dd4f212d02c25b27af58f06bddf83de5ea033e6be7287ebd02ae8b5b47c",
     "GNC/Analysis/ValidatedFixedPoint.lean": "36053db548fc7e0359cf506cc9a41b5a3437bcffd739610c3975e0cce0d7231d",
