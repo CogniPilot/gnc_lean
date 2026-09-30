@@ -1,6 +1,7 @@
 import GNC.Magnus.FOHIncrement
 import GNC.Magnus.LeftConventionJet
 import GNC.Magnus.ResidualBound
+import GNC.Magnus.StructuredResidual
 import GNC.Magnus.CenteredHold
 import GNC.Magnus.SimplexMoments
 import GNC.Magnus.ExponentialPerturbation
@@ -54,6 +55,15 @@ alias lemma2_left := GNC.Magnus.left_linear_degree_four
 
 /-- Lemma 2 by simplex moments: (1/6)(∫(t3 - t2) + ∫(t1 - t2)) = 0. -/
 alias lemma2_simplex := GNC.Magnus.lemma2_cancellation
+
+/-- Lemma 2, structured form: the degree-five residual of the first-order-hold
+generators has zero time component and rotation, velocity and position
+coordinates bounded by rho_R, rho_V and rho_P (Eq. (rho)). -/
+alias lemma2_structured_coords := GNC.Magnus.structured_coord_bounds
+
+/-- Lemma 2, Eq. (rho-norm): the spectral norm of the T^5 residual is at most
+T^5 sqrt(rho_R^2 + rho_V^2 + rho_P^2). -/
+alias lemma2_structured_spectral := GNC.Magnus.structured_residual_spectral_le
 
 /-- Lemma 3: the exact T^5 residual on the right stem,
 -(1/240)[N1,[N0,N1]] - (1/720)[N0,[N0,[N0,N1]]]. -/

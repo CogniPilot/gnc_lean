@@ -382,6 +382,7 @@ import GNC.Dynamics.PlanarCoastCurvature
 import GNC.Magnus.OrbitalInteraction
 import GNC.Dynamics.ReciprocalMass
 import GNC.Magnus.MassDepletionHold
+import GNC.Magnus.StructuredResidual
 import GNC.Dynamics.PlanarBurnDefect
 import GNC.Dynamics.PreintegrationGravityTransfer
 import GNC.Dynamics.KeplerReference
