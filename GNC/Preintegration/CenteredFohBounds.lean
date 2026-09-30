@@ -376,6 +376,40 @@ theorem balanced_foh_remainder
   · simpa only [Nat.add_assoc] using
       (foh_remainder R v p hT ω₀ ω₁ a₀ a₁ hR hR₀ hv hv₀ hp hp₀ (N+2)).2.2
 
+/-- Separate truncation from evaluation and attitude repair. The additional
+terms compare the reported endpoint with the explicit finite predictors; they
+do not involve the unknown exact trajectory. A numerical implementation must
+still enclose these three distances. In particular no guessed floating-point
+allowance, or unproved nonexpansiveness of quaternion normalization, is used. -/
+theorem balanced_reported_remainder
+    (R : ℝ → SO3) (v p : ℝ → E3) {T : ℝ} (hT : 0 ≤ T)
+    (ω₀ ω₁ : Vec3) (a₀ a₁ : E3)
+    (hR : ∀ t, HasDerivAt (fun s => rotation (R s))
+      (rotation (R t) * hat (T • ((1-t) • ω₀ + t • ω₁))) t) (hR₀ : R 0 = 1)
+    (hv : ∀ t, HasDerivAt v (rotation (R t) (acceleration T a₀ a₁ t)) t) (hv₀ : v 0 = 0)
+    (hp : ∀ t, HasDerivAt p (T • v t) t) (hp₀ : p 0 = 0) (N : ℕ)
+    (Rhat : SO3) (vhat phat : E3) :
+    ‖rotation (R 1) - rotation Rhat‖ ≤
+      (T*enorm (ω₁-ω₀)/4)^(N+3) / ((N+3).factorial : ℝ) +
+      ‖predictRotation (meanAngle T ω₀ ω₁) (slopeAngle T ω₀ ω₁) N - rotation Rhat‖ ∧
+    ‖v 1 - vhat‖ ≤
+      ((T*enorm (ω₁-ω₀)/4)^(N+3) / ((N+3).factorial : ℝ)) * (T*(‖a₀‖+‖a₁‖)/2) +
+      ‖predictVelocity (meanAngle T ω₀ ω₁) (slopeAngle T ω₀ ω₁) T a₀ a₁ (N+1) - vhat‖ ∧
+    ‖p 1 - phat‖ ≤
+      T * (((T*enorm (ω₁-ω₀)/4)^(N+3) / ((N+3).factorial : ℝ)) * (T*(‖a₀‖+‖a₁‖)/2)) +
+      ‖predictPosition (meanAngle T ω₀ ω₁) (slopeAngle T ω₀ ω₁) T a₀ a₁ (N+2) - phat‖ := by
+  have h := balanced_foh_remainder R v p hT ω₀ ω₁ a₀ a₁ hR hR₀ hv hv₀ hp hp₀ N
+  refine ⟨?_, ?_, ?_⟩
+  · exact (norm_sub_le_norm_sub_add_norm_sub _
+      (predictRotation (meanAngle T ω₀ ω₁) (slopeAngle T ω₀ ω₁) N) _).trans
+      (_root_.add_le_add h.1 le_rfl)
+  · exact (norm_sub_le_norm_sub_add_norm_sub _
+      (predictVelocity (meanAngle T ω₀ ω₁) (slopeAngle T ω₀ ω₁) T a₀ a₁ (N+1)) _).trans
+      (_root_.add_le_add h.2.1 le_rfl)
+  · exact (norm_sub_le_norm_sub_add_norm_sub _
+      (predictPosition (meanAngle T ω₀ ω₁) (slopeAngle T ω₀ ω₁) T a₀ a₁ (N+2)) _).trans
+      (_root_.add_le_add h.2.2 le_rfl)
+
 /-- Exact constant-gyro/FOH-accelerometer limit for the actual physical flow,
 including velocity and position, at insertion depth two. -/
 theorem constant_gyro_exact
