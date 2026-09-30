@@ -468,3 +468,4 @@ import GNC.Preintegration.CenteredFohWeightedBounds
 import GNC.Analysis.EuclideanOperatorFrobenius
 import GNC.Preintegration.FohInputError
 import GNC.Magnus.FohCssRemainder
+import GNC.Magnus.FohCssResidualSeries
