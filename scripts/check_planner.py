@@ -6,7 +6,7 @@ Only the Python standard library is needed.
 """
 from fractions import Fraction as Q
 import json
-from math import factorial
+from math import factorial, cos, sin, sqrt
 from pathlib import Path
 import subprocess
 
@@ -76,6 +76,61 @@ def main():
                  ("0,0,0,0", "0,0,0,0", 0, 0, 4),
                  ("0,0,0,0", "0,0,0,0", 1, 0, 33)]:
         invoke("hermite", *args, valid=False)
+        calls += 1
+
+    # Independent physical reference check, not a replay of the graph evaluator.
+    for time, phi in [(0, ("3/250", "2/125", "0")), (600, ("0", "0", "0"))]:
+        process = subprocess.run(["lake", "env", "lean", "--run", "GNC/Tools/Planner.lean",
+                                  "orbit-evaluation", str(time), *phi], cwd=ROOT,
+                                 capture_output=True, text=True)
+        assert process.returncode == 0, process.stderr
+        result = json.loads(process.stdout)
+        assert Q(result["time_s"]) == time
+        assert Q(result["normalized_time"]) == Q(time, 600)
+        phase = time*sqrt(398600441800000/7000000**3-1e-4/7000000)
+        expected = [7000000*cos(phase), 7000000*sin(phase), 0]
+        for method in ("geometric", "cartesian"):
+            position = [Q(value) for value in result[method+"_position_m"]]
+            # 0.1 micrometer allows for the independently computed binary64
+            # sin/cos reference in this regression; it is not a proof allowance.
+            assert max(abs(float(a)-b) for a,b in zip(position, expected)) < 1e-7
+            if time == 0:
+                assert position == [7000000,0,0]
+        assert Q(result["geometric_error_bound_m"]) == Q(913,1000000)
+        assert Q(result["cartesian_error_bound_m"]) == Q(313,1000000)
+        calls += 1
+    for args in [("-1","0","0","0"), ("601","0","0","0"), ("0","1/49","0","0")]:
+        invoke("orbit-evaluation", *args, valid=False)
+        calls += 1
+
+    # A repeated query must not inherit previous attitude-dependent state.
+    # Permute the batch, and independently check its zero-error chief point.
+    batches = []
+    for rotations in [("3/250,2/125,0", "0,0,0", "3/250,2/125,0"),
+                      ("0,0,0", "3/250,2/125,0")]:
+        process = subprocess.run(["lake", "env", "lean", "--run", "GNC/Tools/Planner.lean",
+                                  "orbit-batch-evaluation", "600", *rotations], cwd=ROOT,
+                                 capture_output=True, text=True)
+        assert process.returncode == 0, process.stderr
+        result = json.loads(process.stdout)
+        assert result["query_count"] == len(rotations)
+        assert result["geometric_arithmetic"] == 22+20*len(rotations)
+        assert result["cartesian_arithmetic"] == 82+28*len(rotations)
+        assert Q(result["geometric_error_bound_m"]) == Q(913,1000000)
+        assert Q(result["cartesian_error_bound_m"]) == Q(313,1000000)
+        batches.append(result["queries"])
+        calls += 1
+    assert batches[0][0] == batches[0][2] == batches[1][1]
+    assert batches[0][1] == batches[1][0]
+    phase = 600*sqrt(398600441800000/7000000**3-1e-4/7000000)
+    chief = [7000000*cos(phase),7000000*sin(phase),0]
+    for method in ("geometric", "cartesian"):
+        zero = [Q(q) for q in batches[1][0][method+"_position_m"]]
+        assert max(abs(float(q)-r) for q,r in zip(zero,chief)) < 1e-7
+        assert batches[1][0][method+"_position_m"] != batches[1][1][method+"_position_m"]
+    for args in [("600",), ("601","0,0,0"), ("0","1/49,0,0"),
+                 ("0","0,0"), ("0","1/0,0,0")]:
+        invoke("orbit-batch-evaluation", *args, valid=False)
         calls += 1
 
     print(json.dumps({"cli_cases": calls,

@@ -196,8 +196,10 @@ theorem fohPolynomial_derivative {a b : A} (h : TripleVanishes a b) (t : ℝ) :
   simp
   module
 
-/-- Corollary 2 (b): when the FOH problem is confined to a two-step nilpotent
-part, the third-order Magnus exponent is exact for every `t`. -/
+/-- Corollary 2 (b): under the stronger associative triple-product hypothesis,
+satisfied by the rotation-free translation/time ideal, the time-degree-three
+Magnus exponent is exact for every `t`. Abstract two-step Lie nilpotence alone
+does not assert the cube-zero exponential identity used by this proof. -/
 theorem exp_fohExponent {a b : A} (h : TripleVanishes a b) (t : ℝ) :
     exp (fohExponent a b t) = fohPolynomial a b t := by
   have h3 := fohExponent_cube h t
@@ -269,4 +271,18 @@ theorem foh_flow_no_rotation_unique (a s : Vec3) (Y : ℝ → Mat5) (hY0 : Y 0 =
   foh_flow_unique (ideal_tripleVanishes a s) Y hY0 hY
 
 end TerminationSE23
+
+/-- A rotating FOH generator has a nonzero time-degree-five Magnus coefficient,
+despite the square-zero time corner. Here angular velocity is `(1,t,0)` and
+acceleration is zero. This is an exact formal coefficient of the right flow
+by `exponent5_flow_coeff`; it does not assert convergence of an infinite series.
+The vanishing degree-four coefficient therefore does not imply termination. -/
+theorem rotating_foh_fifth_coefficient :
+    ((exponent5 (extended ![0,0,![1,0,0]] 1)
+      (extended ![0,0,![0,1,0]] 0) 0).coeff 5) 2 1 = -(1/240:ℝ) := by
+  rw [linear_degree_five]
+  simp only [comm, extended_commutator]
+  norm_num [extendedBracket, ad, crossProduct, extended, hat, kinematicC,
+    Matrix.cons_val_two]
+
 end GNC.Magnus

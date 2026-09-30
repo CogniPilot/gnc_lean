@@ -1,6 +1,8 @@
 import GNC.Planning.Hermite
 import Lean.Data.Json.FromToJson
 import GNC.Tools.InitialUncertaintyExport
+import GNC.Applications.OrbitalComparison.FiniteEvaluation
+import GNC.Applications.OrbitalComparison.FiniteBatchEvaluation
 
 /-! Exact rational Dubins-polynomial seed and nominal-distance derivatives.
 Run inside the pinned flake:
@@ -78,8 +80,81 @@ private def hermiteReport (args : List String) : Except String Lean.Json := do
       ((GNC.Planning.Hermite.coefficients start finish length).map rational)),
     ("physical_jets", toJson values)]
 
+private def orbitEvaluationReport (args : List String) : Except String Lean.Json := do
+  let [time, px, py, pz] := args |
+    throw "Usage: Planner.lean orbit-evaluation time_seconds phi_x phi_y phi_z (exact integers/fractions)"
+  let time ← parseRational time
+  let px ← parseRational px
+  let py ← parseRational py
+  let pz ← parseRational pz
+  if time < 0 || 600 < time then throw "Certified burn time is 0 through 600 seconds"
+  if (1:ℚ)/2500 < px^2+py^2+pz^2 then throw "Certified rotation-vector norm is at most 1/50 radian"
+  let phi : Fin 3 → ℚ := ![px,py,pz]
+  let t := time/600
+  let rational (q : ℚ) := Lean.Json.str (toString q)
+  let vector (v : Fin 3 → ℚ) := toJson ((List.ofFn v).map rational)
+  let geom := GNC.OrbitalComparison.FiniteEvaluation.physicalPrediction
+    GNC.OrbitalComparison.FiniteQueryGraphData.geometric
+    GNC.OrbitalComparison.FiniteQueryGraphData.geometricOutputs t phi
+  let cart := GNC.OrbitalComparison.FiniteEvaluation.physicalPrediction
+    GNC.OrbitalComparison.FiniteQueryGraphData.cartesian
+    GNC.OrbitalComparison.FiniteQueryGraphData.cartesianOutputs t phi
+  return Json.mkObj [
+    ("arithmetic",toJson "nearest dyadic, 53 normalized fractional bits, ties upward; rational SI output"),
+    ("time_s",rational time),("normalized_time",rational t),("rotation_vector_rad",vector phi),
+    ("geometric_position_m",vector geom),("cartesian_position_m",vector cart),
+    ("geometric_error_bound_m",rational (913/1000000)),
+    ("cartesian_error_bound_m",rational (313/1000000)),
+    ("proof",toJson "GNC.OrbitalComparison.FiniteEvaluation.certificates"),
+    ("scope",toJson "Stated shared-input inverse-square model and initial conditions; not IEEE, compiler or hardware verification")]
+
+private def parseRotation (s : String) : Except String (Fin 3 → ℚ) := do
+  let [x, y, z] ← (s.splitOn ",").mapM parseRational |
+    throw "A rotation vector needs three comma-separated rational components"
+  if (1:ℚ)/2500 < x^2+y^2+z^2 then throw "Certified rotation-vector norm is at most 1/50 radian"
+  return ![x,y,z]
+
+private def orbitBatchReport (args : List String) : Except String Lean.Json := do
+  let time :: rotations := args |
+    throw "Usage: Planner.lean orbit-batch-evaluation time_seconds x,y,z [x,y,z ...]"
+  if rotations.isEmpty then throw "Provide at least one rotation vector"
+  let time ← parseRational time
+  if time < 0 || 600 < time then throw "Certified burn time is 0 through 600 seconds"
+  let angles ← rotations.mapM parseRotation
+  let t := time/600
+  let rational (q : ℚ) := Lean.Json.str (toString q)
+  let vector (v : Fin 3 → ℚ) := toJson ((List.ofFn v).map rational)
+  let geoCache := GNC.OrbitalComparison.FiniteBatchEvaluation.prepare
+    GNC.OrbitalComparison.FiniteBatchData.geometricPrepare t
+  let cartCache := GNC.OrbitalComparison.FiniteBatchEvaluation.prepare
+    GNC.OrbitalComparison.FiniteBatchData.cartesianPrepare t
+  let queries := angles.map fun phi => Json.mkObj [
+    ("rotation_vector_rad",vector phi),
+    ("geometric_position_m",vector (GNC.OrbitalComparison.FiniteBatchEvaluation.physicalPrediction
+      GNC.OrbitalComparison.FiniteBatchData.geometricQuery
+      GNC.OrbitalComparison.FiniteBatchData.geometricOutputs geoCache phi)),
+    ("cartesian_position_m",vector (GNC.OrbitalComparison.FiniteBatchEvaluation.physicalPrediction
+      GNC.OrbitalComparison.FiniteBatchData.cartesianQuery
+      GNC.OrbitalComparison.FiniteBatchData.cartesianOutputs cartCache phi))]
+  return Json.mkObj [
+    ("arithmetic",toJson "nearest dyadic, 53 normalized fractional bits, ties upward; rational SI output"),
+    ("time_s",rational time),("normalized_time",rational t),
+    ("query_count",toJson angles.length),("queries",toJson queries),
+    ("geometric_arithmetic",toJson (GNC.ArithmeticProgram.batchArithmetic
+      GNC.OrbitalComparison.FiniteBatchData.geometricPrepare
+      GNC.OrbitalComparison.FiniteBatchData.geometricQuery angles.length)),
+    ("cartesian_arithmetic",toJson (GNC.ArithmeticProgram.batchArithmetic
+      GNC.OrbitalComparison.FiniteBatchData.cartesianPrepare
+      GNC.OrbitalComparison.FiniteBatchData.cartesianQuery angles.length)),
+    ("geometric_error_bound_m",rational (913/1000000)),
+    ("cartesian_error_bound_m",rational (313/1000000)),
+    ("proof",toJson "GNC.OrbitalComparison.FiniteBatchEvaluation.certificates"),
+    ("scope",toJson "Immutable preparation; shared-input inverse-square model and initial conditions. Counts exclude rounding, reference evaluation and memory; not IEEE, compiler or hardware verification")]
+
 private def report (args : List String) : Except String Lean.Json :=
   match args with
+  | "orbit-batch-evaluation" :: rest => orbitBatchReport rest
+  | "orbit-evaluation" :: rest => orbitEvaluationReport rest
   | ["orbit-uncertainty"] => .ok GNC.Tools.InitialUncertaintyExport.payload
   | "hermite" :: rest => hermiteReport rest
   | _ => seedReport args

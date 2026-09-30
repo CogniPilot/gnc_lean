@@ -5,26 +5,51 @@ and control.** Every included theorem is checked by Lean's kernel under its
 stated hypotheses, with no admitted proofs or additional project axioms.
 
 The [source-hashed record](latest.json) passed on
-2026-09-16T08:58:13.247165+00:00. It covers:
+2026-09-29T21:55:09.379046+00:00. It covers:
 
-- 1194 GNC modules: 1192 mathematical modules and two executable-tool modules.
-- 32,568 theorem declarations among 39,407 declarations.
-- 27,138 application theorem declarations, included in those totals.
-- 73 passing library audit, release, cache and planner regression checks.
-- 1,214 source/configuration files identified by SHA-256, including CI workflows.
+- 1605 GNC modules: 1603 mathematical modules and two executable-tool modules.
+- 38,700 theorem declarations (including generated lemmas).
+- 31,641 application theorem declarations, included in those totals.
+- 85 passing library audit, release, cache and planner regression checks.
+- 1,625 source/configuration files identified by SHA-256, including CI workflows.
 
-All 1198 project Lean files live under `GNC/`; four are verification tooling.
+All 1609 project Lean files live under `GNC/`; four are verification tooling.
 Declaration counts include generated lemmas, not just statements in papers.
 The only foundations are `propext`, `Classical.choice` and `Quot.sound`, using
-released Lean 4.29.1 and mathlib v4.29.1. The audit separately recognizes 59
+released Lean 4.29.1 and mathlib v4.29.1. The audit separately recognizes 70
 Lean-generated runtime companions.
+
+## September 29 cascade and FOH additions
+
+The latest audit also covers the nonlinear Cartesian PD gravity tube,
+all-axis log/rate-to-thrust bridge, decaying-supply comparison, exact powered
+reference and rational spacecraft budgets. The transient cascade theorem
+first proves its nonlinear validity region and then sharpens the bound.
+See [the mathematical contract](../polytopic-orbital-bibo.md).
+
+`FohSharpResidual` checks the exact rotational degree-five norm;
+`FohRadiusTail` checks an infinite-tail estimate under explicit summability
+and coefficient-majorant hypotheses. The new FohDefectCertificate closes the central FOH full-flow certificate by
+finite polynomial defects and a proved exponential tail. It assumes the actual
+ODE, and proves stable coefficient evaluation and cancellations through degree
+four. The previous infinite-series bridge is no longer needed for that theorem.
+FohInterpolationCertificate derives the integrated curvature error and composes
+it with truncation under explicit isometric-transport hypotheses. FohCssEquivalence
+checks the exact correspondence with classical two-sample corrections.
+The instantiated SO(3) spectral chord identity and geodesic horizon composition
+remain separate paper arguments. Complete physical spacecraft/chart/actuator
+composition is likewise not supplied by the BIBO component proofs. Passing this audit
+does not mean that every assertion in either paper has been formalized.
 
 This complete audit covers the library after separating it into its own
 repository. All application proofs remain covered. Paper experiment programs
 and their numerical comparison tests now belong to the consuming papers
 repository, so their former counts are not part of the library regression
-total or source-hash inventory. The final audit reused 1191 module artifacts
-and rebuilt 3. The nonzero-initial uncertainty containment and existence
+total or source-hash inventory. The final audit reused 1603 module artifacts
+and rebuilt 2. The new vanishing gravity-coefficient and regional BIBO proofs,
+including the disturbance-budget optimization, are covered. The
+mounting-error and noncircular-reference/response modules were
+built before that audit and their cached artifacts were checked for reuse. The nonzero-initial uncertainty containment and existence
 proofs, both concrete orbital records, covariance pushforward, coordinate
 equivalence, positive semidefiniteness and deterministic-to-variance bound
 are included. `PredictionMoments` additionally checks affine mean/covariance
@@ -38,6 +63,209 @@ the consuming paper are empirical checks, outside this kernel claim. The release
 also passed from the standalone library directory.
 The CI workflow is configured and syntax-checked locally; this record does
 not claim a hosted GitHub Actions run.
+
+`ReferencePointingResponse` checks reconstruction and the exact physical
+defect split for fixed attitude and magnitude uncertainty about a known
+reference: reference/response defects, the gravity-gradient/Jacobian
+commutator, spatial gravity curvature and the input cross term. Its norm
+bound keeps numerical defects explicit; a radial inverse-square counterexample
+rules out an unqualified exact-linearity claim. The new paper experiment
+still lacks a complete numerical Magnus/reference certificate.
+
+`PointingBox` checks the left/right SE₂(3) error identities, exact log reconstruction,
+planar coordinate bounds, Jacobian contraction, mapped-box distance bound,
+convex-chord obstruction, and an explicit gravity-budget closure inequality.
+Its concrete GEO arithmetic bounds the proposed residual budget below 59 mm.
+Planar area geometry, the paper's Python interval/ellipsoid implementation,
+and the complete orbital specialization are outside this module's claim.
+
+`KeplerSphere` checks the normalized negative-energy Moser map: sphere and
+unit-tangent constraints, orthogonality, inverse reconstruction away from
+collision, physical-to-regularized chain rule, and exact oscillator ODE.
+It checks the great-circle solution's derivatives and initial conditions,
+physical-clock quadrature, Ligon–Schaaf phase correction along regularized
+solutions, and Euclidean oscillator norm preservation. The SU(2) Riemannian
+identification, global symplectic equivalence, energy rescaling, inverse
+phase/clock certification and thrust extension are not formalized by this
+module. No new physical uncertainty certificate or performance advantage
+is claimed for this classical regularization.
+
+`TangentialSharedInput` and `TangentialSharedComparison` construct matched
+physical predictions on the noncircular EP reference for the entire 0.02 rad
+initial-attitude ball. Ideal geometric and exact-component position residuals
+are below 0.568 mm and 1 nm throughout the burn. `PlanarResponseReduction`
+proves the physical gravity block, sparse response identities, commuting
+projection and specified RHS kernel counts of 12 versus 32 arithmetic
+operations. These new bounds exclude numerical response integration and
+query rounding; they do not establish total solver-cost superiority.
+
+`SharedInputLogLift` constructs the unique principal SE2(3) error log from
+physical trajectories with the same body acceleration and angular rate.
+Its fixed inertial attitude offset gives a continuous derivative and constant
+angle norm, including zero angle. `SharedInputOrbitalTube.certificate`
+composes this construction with the approximate-propagator and gravity
+bounds, the non-iterative tube closure, a positive lower physical radius,
+and exact reachable-set containment. Existing classical trajectories and
+certified candidate gains remain hypotheses; a smooth log lift and actual
+departure bounds are no longer assumed by this composition. The two new
+modules were built before the complete audit and their Lake caches reused.
+
+`MountingOrbitalError.approximate_certificate` proves a continuous-time
+physical body-mounting enclosure without an exact retained-system STM or an
+assumed smooth log lift. Frame transport, gravity curvature and generator
+defect are charged; physical trajectory existence and certified gains remain
+hypotheses. `position_prediction_with_reference` adds reference-position error.
+
+`TangentialReference` and `TangentialReferenceObservables` construct and
+certify a noncircular tangentially thrusting reference, with 32 kernel-checked
+polynomial steps. Theorems prove positive radius, an all-time component
+approximation bound, nonzero radial growth, and errors in the reference
+thrust and full gravity-gradient coefficients. The generic observable transfer
+reuses the exact polynomial lift and released ODE existence results.
+
+`PlanarReferenceMotion` and `TangentialReferenceMotion` verify the physical
+projection, constant thrust magnitude, computed radius and mission-time
+rescaling. `TangentialMountingMotion` proves existence, uniqueness and
+noncollision for the nonlinear three-dimensional deputy with body-fixed
+mounting offset at most 0.02 rad. `TangentialMountingCertificate` adds a growing
+continuous-time tube about the computed reference, including its numerical
+error, with an outward SI radius below 0.395 m. This is physical uncertainty,
+not a certificate for either method's conditional predictor residual. The
+paper's matched numerical STT screen is outside this kernel claim and favors
+the exact-component Cartesian response for that mounting model.
+
+`GravityLinearResponse` proves response existence and finite column reuse.
+`TangentialResponseCertificate` and `TangentialResponseColumns` now prove
+the ideal exact-direction predictor's physical position and velocity bounds
+on the noncircular mission, with no assumed deputy proximity. Three reusable
+responses cover the entire 3D mounting ball, with nonlinear-gravity position
+residual below 1 nm. Replacing the reference position by its checked polynomial
+adds its certified error and yields a bound below 3 nm, while still using
+exact response histories. Numerical response generation and evaluation are
+not included in this ideal-response certificate. The Cartesian column
+equivalence is verified; coordinate-exclusive superiority is not claimed.
+
+`AffinePolynomialStep` and `AffinePolynomialChain` verify a finite affine
+response integrator with uncertain time-varying coefficients. The exact
+polynomial residual, coefficient perturbations, row gains and mesh handoffs
+are all charged. `TangentialResponseData` checks 32 degree-eight steps for
+three columns against the library's actual reference polynomials.
+`TangentialFiniteResponse` identifies this affine ODE with the physical
+gravity responses and proves the phase-to-mission time rescaling.
+`exists_certified_burn` composes response and reference integration with the
+full nonlinear orbit certificate, giving position error below 3 nm over the
+entire burn and mounting ball. It assumes neither an exact response nor an
+exact numerical ephemeris. This finite predictor is evaluated over the reals;
+floating polynomial/rotation evaluation and implementation costs are excluded.
+
+`WholeOutputData`, `WholeOutputGraphs` and `WholeOutputEvaluation` verify
+joint reference/deviation expression graphs. Independent real identities and
+new per-graph rounding certificates preserve the 0.963/0.974 mm bounds on
+actual nonlinear motions. Cached evaluation exactly matches full rounded
+evaluation. The complete counts are 76/92 operations, or 52+25N / 70+29N;
+quantization calls are 78+25N / 109+29N and negations remain separate. These
+are specified primitive-model counts, not globally optimal or CPU costs.
+
+`OrbitalApproximateTube.certificate` now composes the physical orbital
+matrix equations with an inexact propagator. `ApproximateLinearTube` charges
+its generator defect, derived from its differential residual and inverse
+gain. `LinearQuadraticTube` proves continuous first-exit closure under
+`d < 1` and `4*a*b < (1-d)^2`, its explicit root, and the separate numerical
+and nonlinear prediction bounds. No exact STM of the retained physical
+system is assumed. Classical trajectories, a C1 log lift, candidate
+invertibility and certified gains remain explicit hypotheses.
+
+`PolynomialResponseTransfer` and the four `PrunedFinite*` modules check
+mixed-degree predictors and both single/batch graphs. Their existence and
+evaluation theorem supplies actual nonlinear physical motions with complete
+0.963 mm / 0.974 mm certificates. Whole-output arithmetic counts are 78/94
+or 53+26N / 71+30N; quantization and negations are separate. Earlier
+uniform-degree records below remain valid at their different accuracies.
+Neither the proposal optimizer nor a universal optimality claim is trusted.
+
+`PoweredCircularExistence` now constructs the full nonlinear translational
+orbit for every attitude vector in the powered example's three-dimensional
+ball, proving noncollision and uniqueness on the entire burn. Its annulus
+margins are derived from the physical gravity gain and add nothing to the
+prediction budget. `PoweredCircularCertifiedMotion` connects the constructed
+motion to the finite all-time 1 mm tube and rounded 0.913 mm / 0.313 mm
+cached outputs. These combined example theorems assume neither an existing
+physical orbit nor an exact response. The general `OrbitalLogTube` theorem
+still states its trajectory, C1 log-lift and STM hypotheses explicitly.
+
+`ChebyshevCompression` uses mathlib's whole-interval Chebyshev extremum
+theorem to remove the degree-eight and degree-seven terms while preserving
+zero initial position and velocity. `CompressedCartesian` transfers the
+existing nonlinear physical certificate to a degree-six Cartesian query.
+The generated coefficients and graphs are independently checked, costing
+73 single-query or 58+28N batch additions/multiplications. Each compressed
+graph has its own dyadic error propagation and full SI bound below 0.749 mm.
+The geometric graphs remain 41 or 22+20N at 0.913 mm. These are scoped query
+comparisons, not globally optimal or complete orbit-integrator costs.
+
+`PreintegrationGravityTransfer` derives explicit physical position/velocity
+bounds from a candidate's acceleration defect and a regional spatial gravity
+bound. A first-exit proof closes the gravity region without iteration or an
+assumed trajectory tube. The common prescribed thrust cancels exactly; sums
+of spatial constants cover additive gravity sources. This is a real-arithmetic
+transfer theorem with explicit solution and residual hypotheses, not a proof
+of floating-point integrator correctness or superiority over other algorithms.
+
+`KeplerReference` derives the exact deviation equation from a thrusting and
+an unforced central-gravity velocity equation. Retaining the forced gravity-
+gradient response leaves precisely the quadratic spatial gravity remainder.
+Its numerical-reference version separately charges reference and response
+residuals. The Kepler trajectory and numerical residual bounds are explicit
+hypotheses; these results do not assert a verified numerical Kepler solver.
+
+`StateDependentMixed` supplies the ambient right-factor change of variables
+for M(X)X+XN and both invariant error equations with the coefficient mismatch
+retained. Its gravity specialization composes the existing `GravityFactor`
+definitions into an exact relative factor using two gravity-moment differences.
+The known gravity factor, its exponential and its nilpotence were reused;
+the new identities do not compute the unknown actual gravity history.
+
+The nilpotence audit added `Magnus.rotating_foh_fifth_coefficient`: a concrete
+rotating FOH generator has a nonzero fifth-degree Magnus coefficient despite
+its square-zero time corner. The closed-exponential identity and special-case
+termination results remain distinct. Misleading comments in
+`OrbitalInteraction` were corrected without changing its theorem statements.
+
+`MountingErrorCoordinates` checks the constant Jacobian pullback of the
+stated rotating-frame position/velocity ODE for a fixed thruster mounting
+error. The thrust term becomes exactly linear in the rotation vector; the
+frame transport remains conjugated by the Jacobian, and full gravity is
+retained. Reconstruction is nonexpansive for the same angle. This is not
+a theorem that the full mounting-error dynamics are group affine or that
+log-coordinate integration universally beats Cartesian methods.
+
+`MountingTransport` now proves the exact commutator and its angular-rate
+bound, including exact cancellation when the rate and mounting axes are
+parallel. `MountingOrbitalError` derives the full coordinate ODE from the
+physical inverse-square-gravity and thrust equations. `MountingOrbitalBounds`
+and `MountingOrbitalTube` close a quadratic continuous-time tube, prove its
+position domain, and bound the reconstructed position prediction. These
+general results assume physical trajectories, stated continuity, and an
+exact STM; they do not certify a new concrete mounting-error mission.
+`MountingTransportFlow` additionally proves the exact finite transport,
+composition, physical-norm isometry, and Euclidean gain bound independent
+of accumulated spin. `MountingTransportResponse` derives the corresponding
+finite-horizon integral input bound from the ODE. Gravity and orbital
+kinematics are not removed by this transport-only result. The frame history
+is supplied, rather than solved from an arbitrary angular-rate history.
+
+`ArithmeticExecutionCost` instruments the rational evaluator without
+changing its rounded outputs. `FinitePredictionWork` checks whole-output
+arithmetic and quantization counts, including common reference/phase and
+SI conversion, and an explicit offline-cost amortization criterion. The
+primitive model excludes arbitrary-integer bit complexity, memory and CPU
+execution; Python proposal profiling is separate empirical evidence.
+
+The coverage audit caught an obsolete monolithic `CertifiedBurn.Orbit`
+artifact after its source was split into checking modules. Only that stale
+module's cache was invalidated and rebuilt; the complete audit then included
+all split modules. Pinned dependency caches and other checked artifacts
+were retained.
 
 `MovingTensorProjection` checks the actual derivative of a moving bilinear
 tensor projection and its discarded mixed-component bound. Idempotence
@@ -80,8 +308,10 @@ and reconstruction remainder. Physical existence is proved at all witnesses.
 `PolynomialLine` derives line evaluation and degree inheritance from mathlib,
 so the obstruction covers every rank and every fitted coefficient choice.
 A one-millimetre Cartesian polynomial guarantee requires degree at least three.
-The consuming paper's cubic/quartic refinement experiment is numerical, not
-a physical certificate or complete-cost proof.
+`TDSTTCubicComparison` now also checks the full Cartesian cubic's physical
+certificate for the same motions: 0.560708 mm / 0.009408 mm/s. Its tighter
+certified budget is not an ordering of actual errors. Quartic sample results
+and measured pipeline costs remain outside the kernel claim.
 
 `QuadraticResponseCertificate` checks the complete computed first-plus-quadratic
 response defect, including both response residuals and the Hessian mismatch,
@@ -785,6 +1015,136 @@ using GNC's full-field certificates; this is not a proof of Flow*'s internal
 certificate construction. Other application and physical-model boundaries
 remain as stated in the [verification contract](../VERIFICATION.md).
 
+`OrbitalNearAffine`, `NearLinearTube`, and `OrbitalLogTube` connect the actual
+shared-input spacecraft matrix equations to a scaled log-error tube. The
+gravity residual includes both the attitude/gradient commutator and spatial
+curvature. A finite-interval variation-of-constants proof and the existing
+quadratic first-exit theorem give the explicit radius under `4*a*b < 1`, its
+prediction-error bound, and exact physical reachable-set reconstruction.
+The certificate proves its one-radian attitude and displacement domains;
+it assumes an existing C1 log lift and exact STM with certified gains.
+It does not assert a computed mission certificate, numerical STM correctness,
+new literature priority, or a computational advantage over another method.
+
+`GeometricSTMDefect` proves the retained log model's moving-frame reduction
+to an ordinary inertial angle-STM response and its exact Jacobian
+reconstruction. Its physical defect identity explicitly charges computed
+reference and response errors. The bound retains quadratic and quartic time
+growth, and the gravity-free ideal predictor has zero acceleration defect
+at every angle. These are analytic theorems, not validation of the consuming
+paper's floating-point feasibility screen.
+
+`MonomialProfile`, `MonomialOrbitCertificate` and
+`RetainedMonomialCertificate` construct time-growing physical orbital
+prediction envelopes from the shared scalar supersolutions.
+`RotationTaylorBound` derives the Cartesian angle-input remainder by
+integrating the rotation curve's second derivative.
+`GeometricSTMPrediction` combines the exact geometric reconstruction with
+quadratic and quartic gravity-defect profiles.
+`PoweredCircularLogTube` verifies an analytic powered reference and a
+uniform submillimeter ideal-predictor guarantee over a three-dimensional
+0.02-radian initial attitude ball for the stated 600-second example.
+`PoweredCircularComparators` supplies matched Cartesian certificates,
+proves the strict envelope comparison, and checks the outward-rounded
+0.554 mm, 3.859 mm and 0.904 nm records. These bounds assume the exact
+linear response equations; they do not validate floating-point response
+evaluation. The exact-component Cartesian envelope is the smallest.
+The new profile lemmas live in an extension module so they do not change
+the shared supersolution modules' dependency hashes.
+
+`FiniteResponseCertificate` proves a candidate response radius from its
+checked differential defect and gives a Cartesian physical envelope with
+separate constant input and monomial numerical residuals.
+`FiniteGeometricPrediction` proves the corresponding geometric physical
+certificate without assuming an exact linear response. `JacobianAffine`
+checks a division-free polynomial reconstruction, its explicit operator
+tail, transfer of a prediction bound, and a matched Cartesian quadratic-angle
+input remainder.
+
+`PolynomialTimeProfile` and `LinearResponsePolynomial` now check exact
+coefficient residuals, real derivatives and whole-time monomial envelopes.
+`MonomialRational` connects rational endpoint evaluation to those real bounds.
+`FiniteResponseData` checks the concrete degree-seven response coefficients,
+zero-prefix cancellations and every rational closure using `decide +kernel`.
+`FiniteCircularResponse` adds the order-16 trigonometric tails and swept-angle
+scaling; its gradient surrogate is not assumed to have unit reference norm.
+`FiniteCircularCertificate.submillimeter` proves the explicit polynomial and
+affine Jacobian predictor has position error below 1 mm throughout the 600 s
+burn for every attitude vector in the three-dimensional 0.02 rad ball. It
+supplies the predictor, rather than assuming an exact response or an unchecked
+residual. It assumes an actual classical solution to the stated physical ODE.
+Floating evaluation remains outside this real-arithmetic certificate.
+The matched finite Cartesian records and their query comparison are now
+checked as described below.
+
+This audit reused 1426 checked module artifacts and rebuilt 4. Both the
+project cache and the released mathlib dependency cache were retained.
+
+`RotationFeatureBounds` checks exact and quadratic rotation features,
+including their sharper diagonal bounds. `FiniteCartesianData`,
+`FiniteCartesianResponse` and `FiniteCartesianCertificate` provide two
+explicit degree-eight competitors with full nonlinear-gravity certificates
+over the same burn and attitude ball. Their displayed physical bounds are
+0.313 mm and 0.284 mm; the finite geometric bound is 0.913 mm.
+
+`ArithmeticProgram` checks straight-line graph semantics. The concrete
+`FiniteQueryGraphData` graphs reproduce from the consuming paper's Nix
+package, and `FiniteQueryGraphs` proves they equal the certified predictors
+for every real input. `fixed_accuracy_queries` combines both physical
+certificates with 41 versus 85 additions/multiplications, plus four negations each. The queries include feature formation and geometric
+reconstruction; reference/phase preparation, unit conversion, memory costs
+and floating rounding are excluded. These are two checked implementations,
+not an optimality theorem over Cartesian algorithms or an end-to-end runtime
+comparison. All displayed rational budget roundings are kernel-checked. The updated
+graphs hoist common time-squared factors and reuse exact polynomial
+differences. A reproducible search tries 186 geometric and 900 Cartesian
+variants; the canonical graph identities and counts are rechecked by Lean.
+The optimizer is not trusted and this finite search does not prove optimality.
+
+`ArithmeticRounding` proves absolute-error propagation through the counted
+DAG, including rounded constants, uncertain inputs and every arithmetic node.
+`ArithmeticDyadic` connects an executable rational evaluator to nearest
+fixed-grid rounding with mathlib's proved integer-rounding error.
+`FiniteEvaluationData` checks the 53-fractional-bit grid, a squared-endpoint
+rate enclosure, a shared reference graph and the complete rational budgets.
+`FiniteEvaluation.certificates` proves that every admissible rational query
+has SI position error below 0.913 mm (geometric) or 0.313 mm (Cartesian),
+including phase, reference Taylor tail, input quantization and graph rounding.
+Its `domain_sufficient` theorem connects the CLI's rational radius condition
+to the physical theorem's Euclidean attitude domain. The planner now exposes
+`orbit-evaluation`; five additional interface regressions check reference
+outputs and domain rejection. The parser, compiler, IEEE arithmetic,
+fixed-width overflow and CPU runtime remain outside this mathematical claim.
+
+`MonomialProfileComparison` proves the pointwise time-profile ratios for
+quadratic and quartic residuals. `GeometricEnvelopeComparison` turns these
+into an input-dependent strict comparison and requested envelope-ratio test;
+it also proves the matched ideal exact-component Cartesian envelope is no
+larger. `PoweredCircularEnvelopeComparison` verifies agreement with the
+physical example's existing budgets and proves its sixfold advantage over
+the angle STM at every positive time. These compare sufficient envelopes,
+not actual-error lower bounds, and do not claim to beat exact-component
+Cartesian accuracy or total computational cost.
+
+`ArithmeticStages` proves reusable preparation for input-independent
+prefixes. `FiniteBatchData` supplies independently optimized phase prefixes
+and attitude query graphs. `FiniteBatchQueries` proves exact equivalence to
+the physically certified predictors for all real inputs, preservation of
+the 1 mm target, and batch arithmetic counts 22+20N versus 82+28N. Negations
+are separate (1+3N versus zero). These staged graphs are distinct from the
+single-query graphs and now have their own dyadic certificate described below;
+no IEEE or hardware claim is inferred. The Nix experiment reproduces the records and
+reports its finite search and Pareto frontier.
+
+`ArithmeticDyadicStages` proves preparation reuse under the declared
+rounding semantics, and `FiniteBatchEvaluationData` checks the new graphs'
+complete rational budgets. `FiniteBatchEvaluation.certificates` proves
+0.913 mm / 0.313 mm SI bounds for the executable cached predictions,
+independent of batch length. The planner's `orbit-batch-evaluation` prepares
+once per method and then evaluates a list of attitudes. Seven new interface
+regressions check repeated/permuted queries, a zero-attitude chief position,
+counts/bounds and rejected inputs. The full audit now passes 85 checks.
+
 Run `nix develop --command python scripts/verify.py` for an incremental build,
 axiom audit and regression checks. Lake retains checked project artifacts in
 `.lake/build` and released dependency artifacts in `.lake/packages`. Use
@@ -796,3 +1156,12 @@ nix develop --command python scripts/verify.py --check-report docs/verification/
 ```
 
 A verification record attests only to its exact source snapshot.
+
+`SharedResponseData` certifies 32 polynomial steps for the eight-state
+geometric and twenty-state component response systems. `SharedResponseSystem`
+proves approximation bounds for any continuous zero-initial solution of
+those sparse ODEs. `PlanarResponseApproximation` and `SharedResponseTransfer`
+prove reconstruction bounds and the conditional 0.686/0.323 mm budgets.
+Physical-response identification remains a hypothesis of the transfer
+theorems; these modules alone do not complete the finite noncircular
+physical certificate. All 37 added modules are included in this audit.

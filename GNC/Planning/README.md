@@ -99,3 +99,36 @@ the translated eight-coefficient output satisfies the scaled endpoint
 equations, then invoke uniqueness. See the
 [library verification contract](../../docs/VERIFICATION.md) for the precise
 claim supported by the build.
+
+## Certified orbital position query
+
+The planner CLI also exposes `orbit-evaluation time_seconds phi_x phi_y phi_z`.
+Each argument is an exact integer or fraction. For the powered-circle example,
+it checks the 0–600 s interval and the 0.02 rad three-axis attitude ball and
+returns rational SI positions from both certified predictors. For example:
+
+```sh
+nix develop --command lake env lean --run GNC/Tools/Planner.lean \
+  orbit-evaluation 600 3/250 2/125 0
+```
+
+`OrbitalComparison.FiniteEvaluation.certificates` supplies the physical
+position bounds including the declared 53-fractional-bit dyadic rounding,
+phase/reference preparation and SI reconstruction. The backend uses rationals
+and unbounded integers; this is not IEEE or hardware verification. The parser
+and JSON interface have regression checks; the evaluator and rational-domain
+implication have Lean proofs.
+
+For several attitudes at the same epoch, preparation can be shared:
+
+```sh
+nix develop --command lake env lean --run GNC/Tools/Planner.lean \
+  orbit-batch-evaluation 600 0,0,0 3/250,2/125,0 0,0,1/50
+```
+
+Each attitude is one comma-separated vector. `FiniteBatchEvaluation.prepare`
+constructs an immutable phase/reference/intermediate-value cache; each query
+reads that cache. Its `certificates` theorem includes preparation and query
+rounding and preserves the 0.913 mm / 0.313 mm bounds independently of batch
+length. The reported arithmetic counts still exclude rounding work, memory
+and the common reference calculation.

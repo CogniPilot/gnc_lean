@@ -5,8 +5,10 @@ The variational generator A(t) = drift + gravity (K t) has a nilpotent free-drif
 part with drift^2 = 0, so exp(t . drift) = 1 + t . drift terminates exactly.
 Conjugating the time-varying gravity gradient by this free-drift flow yields the
 interaction generator L(t). Each L(t) is pointwise square-zero, but products and
-commutators of L at different times do not vanish: the gravity gradient values do
-not commute across time, so the interaction Magnus series does not terminate.
+commutators at different times can be nonzero, even for a constant gravity
+gradient. Pointwise nilpotence therefore does not justify Magnus termination.
+The identities below do not prove an infinite nonzero Magnus tail for each
+particular gradient history.
 The convention is left evolution, Phi' = A Phi. -/
 noncomputable section
 open Matrix NormedSpace MeasureTheory
@@ -94,7 +96,7 @@ theorem interaction_square (K : ℝ → Matrix n n ℝ) (t : ℝ) :
       smul_smul, smul_neg, pow_two]; module)
 
 /-- Two-time product of interaction generators: a rank-one gravity moment,
-weighted by the time separation (s - t). The cross-time product is nonzero. -/
+weighted by the time separation (s - t). The cross-time product can be nonzero. -/
 theorem interaction_product (K : ℝ → Matrix n n ℝ) (s t : ℝ) :
     interaction K s * interaction K t = (s - t) • productBlock s t (K s * K t) := by
   rw [interaction_blocks, interaction_blocks, fromBlocks_multiply, productBlock, fromBlocks_smul,
@@ -104,7 +106,8 @@ theorem interaction_product (K : ℝ → Matrix n n ℝ) (s t : ℝ) :
       smul_smul, smul_neg, pow_two]; module)
 
 /-- Commutator of interaction generators at two times, as a difference of the
-two rank-one gravity moments (orders K s K t and K t K s do not agree). -/
+two rank-one gravity moments. Their time weights can differ even when the
+gravity matrices K s and K t commute. -/
 theorem interaction_commutator (K : ℝ → Matrix n n ℝ) (s t : ℝ) :
     Magnus.comm (interaction K s) (interaction K t) =
       (s - t) • productBlock s t (K s * K t) - (t - s) • productBlock t s (K t * K s) := by
@@ -185,8 +188,9 @@ theorem interaction_factorization (K : ℝ → Matrix n n ℝ)
 
 /-- Concrete witness that the cross-time interaction product is nonzero: with a
 constant unit gradient, L(0) L(1) does not vanish. Unlike the pure translation
-lift, whose cross-time products all vanish, the interaction generators do not
-annihilate across time, so the interaction Magnus series does not terminate. -/
+lift, whose cross-time products all vanish, these interaction generators do not
+annihilate across time. This witness rules out that sufficient termination
+argument; nonzero products alone do not establish a nonzero Magnus tail. -/
 theorem interaction_product_ne_zero :
     interaction (n := Fin 1) (fun _ => (1 : Matrix (Fin 1) (Fin 1) ℝ)) 0 *
       interaction (fun _ => (1 : Matrix (Fin 1) (Fin 1) ℝ)) 1 ≠ 0 := by
