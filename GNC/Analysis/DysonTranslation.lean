@@ -288,4 +288,28 @@ theorem triangular_error_bound_centered_physical
   rw [he, ← smul_sub, norm_smul, Real.norm_eq_abs, abs_of_nonneg hT]
   exact mul_le_mul_of_nonneg_left hpb hT
 
+/-- Removing a constant rotation leaves no rotational generator. The full
+triangular depth-two construction is then exact for every continuous input,
+not just for held acceleration. This is the exact limiting case used by the
+compact FOH paper. `a` is already expressed in the rotating interaction frame. -/
+theorem zero_rotation_depth_two (R a v p : ℝ → E)
+    (ha : Continuous a)
+    (hR : ∀ t, HasDerivAt R 0 t) (hR0 : R 0 = 1)
+    (hv : ∀ t, HasDerivAt v (R t * a t) t) (hv0 : v 0 = 0)
+    {T : ℝ} (hT : 0 ≤ T)
+    (hp : ∀ t, HasDerivAt p (T • v t) t) (hp0 : p 0 = 0) :
+    R 1 = approx (fun _ => (0 : E)) 3 1 ∧
+    v 1 = velocityApprox (fun _ => (0 : E)) a 2 1 ∧
+    p 1 = T • positionApprox (fun _ => (0 : E)) a 2 1 := by
+  have hconst (t : ℝ) : R t = 1 := by
+    rw [← hR0]
+    exact is_const_of_deriv_eq_zero (fun s => (hR s).differentiableAt)
+      (fun s => (hR s).deriv) t 0
+  have hh := triangular_error_bound_centered_physical
+    (fun _ => (0 : E)) R a v p continuous_const ha
+    (fun t => by simpa using hR t) hR0 hv hv0 hT (norm_nonneg (1 : E))
+    (le_refl (0 : ℝ)) hp hp0 (fun t _ => by simp)
+    (fun t _ => by simp [hconst]) (le_refl (∫ t in (0 : ℝ)..1, ‖a t‖)) 0
+  simpa [sub_eq_zero] using hh
+
 end GNC.Dyson
