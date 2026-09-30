@@ -464,5 +464,6 @@ import GNC.Preintegration.SquareZeroTransition
 import GNC.Preintegration.SampleCovariance
 import GNC.Analysis.TrigonometricRemainder
 import GNC.Preintegration.CenteredFohBounds
+import GNC.Preintegration.CenteredFohWeightedBounds
 import GNC.Preintegration.FohInputError
 import GNC.Magnus.FohCssRemainder

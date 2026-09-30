@@ -1165,3 +1165,16 @@ prove reconstruction bounds and the conditional 0.686/0.323 mm budgets.
 Physical-response identification remains a hypothesis of the transfer
 theorems; these modules alone do not complete the finite noncircular
 physical certificate. All 37 added modules are included in this audit.
+
+The centered FOH physical theorem now retains the time-dependent rotation
+remainder and the remaining-time position weight. `CenteredFohWeightedBounds`
+proves `balanced_weighted_foh_remainder` from the actual rotation, velocity and
+position ODEs and `balanced_weighted_reported_remainder` by the triangle
+inequality. `CenteredFohWeights` checks the exact polynomial integrals: at
+common residual order two the velocity weight is `(29a+99b)/640` and the
+position weight is `(257a+352b)/13440`, where `a,b` are the endpoint acceleration
+norms. `DysonWeightedTranslation` proves the general weighted physical
+integration bound. No change in the finite propagator or additional unknown
+error assumptions is required. Numerical evaluation distances must still be
+certified separately; no floating-point correctness claim follows from these
+real-arithmetic theorems.
