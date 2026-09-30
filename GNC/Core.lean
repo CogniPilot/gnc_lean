@@ -471,3 +471,4 @@ import GNC.Magnus.FohCssRemainder
 import GNC.Magnus.FohCssResidualSeries
 import GNC.Preintegration.PhysicalDefectMoments
 import GNC.Preintegration.PhysicalDefectPolynomial
+import GNC.Preintegration.FohSampleCompression

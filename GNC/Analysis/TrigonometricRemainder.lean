@@ -90,6 +90,43 @@ theorem approximation_bound_of_order {θ : ℝ} {n : ℕ}
   exact alternating_series_error_bound (term θ n)
     (term_antitone_of_order hθ) (term_summable θ n) k
 
+/-- The signed series term has a forward recurrence with decreasing
+magnitudes in the coefficient-specific alternating-tail domain. -/
+theorem signed_term_step (θ : ℝ) (n j : ℕ) :
+    (-1:ℝ)^(j+1)*term θ n (j+1) =
+      -(θ^2*((-1:ℝ)^j*term θ n j)) /
+        ((n+2*j+1:ℕ)*(n+2*j+2:ℕ)) := by
+  unfold term
+  rw [show n+2*(j+1) = (n+2*j+1)+1 by omega,
+    Nat.factorial_succ,Nat.factorial_succ,pow_succ,pow_succ]
+  have hf : ((n+2*j).factorial:ℝ) ≠ 0 := by exact_mod_cast Nat.factorial_ne_zero _
+  have h1 : ((n+2*j+1:ℕ):ℝ) ≠ 0 := by positivity
+  have h2 : ((n+2*j+2:ℕ):ℝ) ≠ 0 := by positivity
+  push_cast
+  field_simp
+  ring
+
+def forwardTerm (θ : ℝ) (n : ℕ) : ℕ → ℝ
+  | 0 => 1/(n.factorial:ℝ)
+  | j+1 => -(θ^2*forwardTerm θ n j)/((n+2*j+1:ℕ)*(n+2*j+2:ℕ))
+
+theorem forwardTerm_eq (θ : ℝ) (n j : ℕ) :
+    forwardTerm θ n j = (-1:ℝ)^j*term θ n j := by
+  induction j with
+  | zero => simp [forwardTerm,term]
+  | succ j ih => rw [forwardTerm,ih,← signed_term_step]
+
+/-- Forward evaluation retains the same entire coefficient and full
+alternating tail. Fixed-precision executable arithmetic remains separate. -/
+theorem forward_approximation_bound {θ : ℝ} {n : ℕ}
+    (hθ : θ^2 ≤ ((n:ℝ)+1)*((n:ℝ)+2)) (k : ℕ) :
+    |remainder θ n - ∑ j ∈ Finset.range k, forwardTerm θ n j| ≤
+      |forwardTerm θ n k| := by
+  simp only [forwardTerm_eq]
+  have ht : 0 ≤ term θ n k := by unfold term; positivity
+  simpa only [polynomial,abs_mul,abs_pow,abs_neg,abs_one,one_pow,
+    one_mul,abs_of_nonneg ht] using approximation_bound_of_order hθ k
+
 theorem remainder_cos (θ : ℝ) : remainder θ 0 = Real.cos θ := by
   rw [Real.cos_eq_tsum]
   unfold remainder term
