@@ -470,3 +470,4 @@ import GNC.Preintegration.FohInputError
 import GNC.Magnus.FohCssRemainder
 import GNC.Magnus.FohCssResidualSeries
 import GNC.Preintegration.PhysicalDefectMoments
+import GNC.Preintegration.PhysicalDefectPolynomial
