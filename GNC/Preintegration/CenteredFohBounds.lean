@@ -351,6 +351,31 @@ theorem foh_remainder
     hR₀ hv hv₀ hp hp₀ N
   simpa only [slopeAngle, enorm_smul, abs_of_nonneg hT] using hh
 
+/-- Balance the number of residual-rotation insertions across the three
+physical outputs. The common correction order is m=N+2: select rotation from
+total depth N+2, velocity from N+3, and position from N+4. Each output then
+uses the same Dyson approximant with N+3 terms (identity included).
+This is a different finite approximation, not a stronger bound on the old
+fixed-total-depth output. No extra assumptions on the physical flow are added. -/
+theorem balanced_foh_remainder
+    (R : ℝ → SO3) (v p : ℝ → E3) {T : ℝ} (hT : 0 ≤ T)
+    (ω₀ ω₁ : Vec3) (a₀ a₁ : E3)
+    (hR : ∀ t, HasDerivAt (fun s => rotation (R s))
+      (rotation (R t) * hat (T • ((1-t) • ω₀ + t • ω₁))) t) (hR₀ : R 0 = 1)
+    (hv : ∀ t, HasDerivAt v (rotation (R t) (acceleration T a₀ a₁ t)) t) (hv₀ : v 0 = 0)
+    (hp : ∀ t, HasDerivAt p (T • v t) t) (hp₀ : p 0 = 0) (N : ℕ) :
+    ‖rotation (R 1) - predictRotation (meanAngle T ω₀ ω₁) (slopeAngle T ω₀ ω₁) N‖ ≤
+      (T*enorm (ω₁-ω₀)/4)^(N+3) / ((N+3).factorial : ℝ) ∧
+    ‖v 1 - predictVelocity (meanAngle T ω₀ ω₁) (slopeAngle T ω₀ ω₁) T a₀ a₁ (N+1)‖ ≤
+      ((T*enorm (ω₁-ω₀)/4)^(N+3) / ((N+3).factorial : ℝ)) * (T*(‖a₀‖+‖a₁‖)/2) ∧
+    ‖p 1 - predictPosition (meanAngle T ω₀ ω₁) (slopeAngle T ω₀ ω₁) T a₀ a₁ (N+2)‖ ≤
+      T * (((T*enorm (ω₁-ω₀)/4)^(N+3) / ((N+3).factorial : ℝ)) * (T*(‖a₀‖+‖a₁‖)/2)) := by
+  refine ⟨(foh_remainder R v p hT ω₀ ω₁ a₀ a₁ hR hR₀ hv hv₀ hp hp₀ N).1, ?_, ?_⟩
+  · simpa only [Nat.add_assoc] using
+      (foh_remainder R v p hT ω₀ ω₁ a₀ a₁ hR hR₀ hv hv₀ hp hp₀ (N+1)).2.1
+  · simpa only [Nat.add_assoc] using
+      (foh_remainder R v p hT ω₀ ω₁ a₀ a₁ hR hR₀ hv hv₀ hp hp₀ (N+2)).2.2
+
 /-- Exact constant-gyro/FOH-accelerometer limit for the actual physical flow,
 including velocity and position, at insertion depth two. -/
 theorem constant_gyro_exact
