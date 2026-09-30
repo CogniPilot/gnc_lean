@@ -1,6 +1,7 @@
 import GNC.Preintegration.CenteredFohBounds
 import GNC.Analysis.CenteredFohWeights
 import GNC.Analysis.DysonWeightedTranslation
+import GNC.Analysis.EuclideanOperatorFrobenius
 
 /-! Physical FOH remainders with exact time weights. The finite propagators
 are unchanged. The improvement comes only from integrating the pointwise
@@ -190,5 +191,32 @@ theorem balanced_weighted_reported_remainder
   · exact (norm_sub_le_norm_sub_add_norm_sub _
       (predictPosition (meanAngle T ω₀ ω₁) (slopeAngle T ω₀ ω₁) T a₀ a₁ (N+2)) _).trans
       (_root_.add_le_add h.2.2 le_rfl)
+
+/-- Same reported physical endpoint bound with the rotation error expressed
+in Frobenius norm, matching the entrywise numerical endpoint checker. -/
+theorem balanced_weighted_reported_frobenius_remainder
+    (R : ℝ → SO3) (v p : ℝ → E3) {T : ℝ} (hT : 0 ≤ T)
+    (ω₀ ω₁ : Vec3) (a₀ a₁ : E3)
+    (hR : ∀ t, HasDerivAt (fun s => rotation (R s))
+      (rotation (R t) * hat (T • ((1-t) • ω₀ + t • ω₁))) t) (hR₀ : R 0 = 1)
+    (hv : ∀ t, HasDerivAt v (rotation (R t) (acceleration T a₀ a₁ t)) t) (hv₀ : v 0 = 0)
+    (hp : ∀ t, HasDerivAt p (T • v t) t) (hp₀ : p 0 = 0) (N : ℕ)
+    (Rhat : SO3) (vhat phat : E3) :
+    EuclideanOperator.frobenius (rotation (R 1) - rotation Rhat) ≤
+      Real.sqrt 3 * ((T*enorm (ω₁-ω₀)/4)^(N+3) / ((N+3).factorial : ℝ)) +
+      EuclideanOperator.frobenius
+        (predictRotation (meanAngle T ω₀ ω₁) (slopeAngle T ω₀ ω₁) N - rotation Rhat) ∧
+    ‖v 1 - vhat‖ ≤
+      ((T*enorm (ω₁-ω₀)/4)^(N+3) / ((N+3).factorial : ℝ)) * T *
+        Dyson.velocityWeight (N+3) ‖a₀‖ ‖a₁‖ +
+      ‖predictVelocity (meanAngle T ω₀ ω₁) (slopeAngle T ω₀ ω₁) T a₀ a₁ (N+1) - vhat‖ ∧
+    ‖p 1 - phat‖ ≤
+      ((T*enorm (ω₁-ω₀)/4)^(N+3) / ((N+3).factorial : ℝ)) * T^2 *
+        Dyson.positionWeight (N+3) ‖a₀‖ ‖a₁‖ +
+      ‖predictPosition (meanAngle T ω₀ ω₁) (slopeAngle T ω₀ ω₁) T a₀ a₁ (N+2) - phat‖ := by
+  have h := balanced_weighted_foh_remainder R v p hT ω₀ ω₁ a₀ a₁ hR hR₀ hv hv₀ hp hp₀ N
+  have hr := balanced_weighted_reported_remainder R v p hT ω₀ ω₁ a₀ a₁
+    hR hR₀ hv hv₀ hp hp₀ N Rhat vhat phat
+  exact ⟨EuclideanOperator.reported_bound _ _ _ h.1 le_rfl, hr.2⟩
 
 end GNC.Preintegration.CenteredFoh

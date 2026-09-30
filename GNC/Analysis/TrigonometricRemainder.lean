@@ -64,6 +64,32 @@ theorem approximation_bound {θ : ℝ} (hθ : θ^2 ≤ 4) {n : ℕ} (hn : 1 ≤ 
   exact alternating_series_error_bound (term θ n)
     (term_antitone hθ hn) (term_summable θ n) k
 
+/-- A coefficient-specific alternating tail condition. For C8 and C9 this
+allows mean angles well beyond the small-angle evaluation branch. -/
+theorem term_antitone_of_order {θ : ℝ} {n : ℕ}
+    (hθ : θ^2 ≤ ((n : ℝ)+1)*((n : ℝ)+2)) : Antitone (term θ n) := by
+  apply antitone_nat_of_succ_le
+  intro j
+  have hm : (n : ℝ) ≤ (n+2*j : ℕ) := by exact_mod_cast (show n ≤ n+2*j by omega)
+  have hprod : θ^2 ≤ (((n+2*j : ℕ) : ℝ)+2)*(((n+2*j : ℕ) : ℝ)+1) := by
+    nlinarith [Nat.cast_nonneg (α := ℝ) n, Nat.cast_nonneg (α := ℝ) (n+2*j)]
+  unfold term
+  rw [show n+2*(j+1) = (n+2*j+1)+1 by omega, Nat.factorial_succ,
+    Nat.factorial_succ]
+  push_cast
+  rw [pow_succ]
+  apply (div_le_div_iff₀ (by positivity) (by positivity)).mpr
+  have hh := mul_le_mul_of_nonneg_left hprod
+    (show 0 ≤ (θ^2)^j * ((n+2*j).factorial : ℝ) by positivity)
+  push_cast at hh
+  nlinarith [hh]
+
+theorem approximation_bound_of_order {θ : ℝ} {n : ℕ}
+    (hθ : θ^2 ≤ ((n : ℝ)+1)*((n : ℝ)+2)) (k : ℕ) :
+    |remainder θ n - polynomial θ n k| ≤ (θ^2)^k / (n+2*k).factorial := by
+  exact alternating_series_error_bound (term θ n)
+    (term_antitone_of_order hθ) (term_summable θ n) k
+
 theorem remainder_cos (θ : ℝ) : remainder θ 0 = Real.cos θ := by
   rw [Real.cos_eq_tsum]
   unfold remainder term

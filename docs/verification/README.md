@@ -1178,3 +1178,16 @@ integration bound. No change in the finite propagator or additional unknown
 error assumptions is required. Numerical evaluation distances must still be
 certified separately; no floating-point correctness claim follows from these
 real-arithmetic theorems.
+
+`EuclideanOperatorFrobenius` proves the orthonormal-column norm identity,
+operator-to-Frobenius conversion, entrywise squared-budget rule and triangle
+bound for reported Euclidean operators. `CenteredFohWeightedBounds` now
+provides `balanced_weighted_reported_frobenius_remainder`, connecting these
+results to the actual FOH physical trajectory ODE. The coefficient-specific
+`TrigonometricRemainder.approximation_bound_of_order` uses mathlib's
+alternating-series theorem under `theta^2 <= (n+1)(n+2)`; this includes C8/C9
+at the four-radian synthetic mean. These results support a finite-expression
+certificate evaluator without reconstructing the exact flow. The numerical
+Python interval evaluator, generated CSE graph and benchmark outputs retain
+their separate validation status; no executable floating-point correctness
+claim is implied by the kernel-checked mathematical theorems.
