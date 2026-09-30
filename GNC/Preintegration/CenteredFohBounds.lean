@@ -125,6 +125,24 @@ def columnInput (F : Vec3) (T : ℝ) (a₀ a₁ : E3) (t : ℝ) : Op :=
 def errorFlow (R : ℝ → SO3) (F : Vec3) (t : ℝ) : Op :=
   rotation (R t) * unmean F t
 
+/-- The input slope is known exactly under the FOH model. -/
+theorem acceleration_derivative (T : ℝ) (a₀ a₁ : E3) (t : ℝ) :
+    HasDerivAt (acceleration T a₀ a₁) (T • (a₁-a₀)) t := by
+  have hh := ((((hasDerivAt_const t (1 : ℝ)).sub (hasDerivAt_id t)).smul_const a₀).add
+    ((hasDerivAt_id t).smul_const a₁)).const_smul T
+  convert hh using 1
+  simp [sub_eq_add_neg, add_comm]
+
+/-- Removing mean rotation from the rotation ODE does not make the transformed
+acceleration slowly varying: its derivative still contains the mean generator.
+This explains why quadrature in the transformed frame can still resolve F. -/
+theorem transported_derivative (F : Vec3) (T : ℝ) (a₀ a₁ : E3) (t : ℝ) :
+    HasDerivAt (transported F T a₀ a₁)
+      (hat F (transported F T a₀ a₁ t) + mean F t (T • (a₁-a₀))) t := by
+  have hh := (hasDerivAt_exp_smul_const' (hat F) t).clm_apply
+    (acceleration_derivative T a₀ a₁ t)
+  simpa only [transported, mean, ContinuousLinearMap.mul_apply] using hh
+
 theorem transported_continuous (F : Vec3) (T : ℝ) (a₀ a₁ : E3) :
     Continuous (transported F T a₀ a₁) := by
   exact (mean_continuous F).clm_apply (by unfold acceleration; fun_prop)

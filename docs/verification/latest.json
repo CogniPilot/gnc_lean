@@ -1,7 +1,7 @@
 {
   "schema_version": 5,
   "status": "passed",
-  "checked_at_utc": "2026-09-30T15:51:31.040467+00:00",
+  "checked_at_utc": "2026-09-30T16:35:09.497975+00:00",
   "lean_toolchain": "leanprover/lean4:v4.29.1",
   "lean_binary": "/nix/store/19vi5pd27jl8ng6awswallrkv8kw1rih-lean-official-4.29.1/bin/lean",
   "library_build": {
@@ -1670,10 +1670,10 @@
       "GNC.Tools.InitialUncertaintyExport",
       "GNC.Tools.Planner"
     ],
-    "project_declarations": 52713,
+    "project_declarations": 52715,
     "namespace_only_declarations": 0,
-    "library_theorem_declarations": 42967,
-    "library_declarations": 52713,
+    "library_theorem_declarations": 42969,
+    "library_declarations": 52715,
     "compiler_runtime_companions": 78,
     "axioms": [
       "Classical.choice",
@@ -3380,7 +3380,7 @@
     "GNC/Planning/Hermite.lean": "a5a70750eea65c28b6afdadab5112b89811b3cabfbd451d1bcb1401bd325a1e2",
     "GNC/Planning/PolynomialKernel.lean": "817f90a433e833557f4c29be6dea3a59daba01a0db485f5625bad3f77797b23a",
     "GNC/Planning/SmoothStep.lean": "ee699136d50d3a93df25ba9ddde6f0b1b1d98959c638febebe1d353902043a80",
-    "GNC/Preintegration/CenteredFohBounds.lean": "75d1e36da4c14483020bf5621e3bfb9ed7d919b648d693753bcaac650bce5665",
+    "GNC/Preintegration/CenteredFohBounds.lean": "e3799fbfbe9062beb507691ac0be1211cc594e50786fcc18c4c9ad101c35c5bd",
     "GNC/Preintegration/ClosedForm.lean": "51538499636dd994891fc62d34e983579bbedf8f1da155b0055a4a345bfb5ca2",
     "GNC/Preintegration/EndpointTransition.lean": "4444818ae47415204dd6cebd674bc11cbe3598295a0664c633d5ebfc8f2f2af9",
     "GNC/Preintegration/ErrorDynamics.lean": "b84d65e5bf4b7e55ea803dae1c9e839548ca5669fe5e549be9ba06734c13f70c",
