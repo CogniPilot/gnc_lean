@@ -5,15 +5,15 @@ and control.** Every included theorem is checked by Lean's kernel under its
 stated hypotheses, with no admitted proofs or additional project axioms.
 
 The [source-hashed record](latest.json) passed on
-2026-10-01T06:46:13.844589+00:00. It covers:
+2026-10-01T07:28:44.874290+00:00. It covers:
 
-- 1667 GNC modules: 1665 mathematical modules and 2 executable-tool modules.
-- 44,341 theorem declarations (including generated lemmas).
+- 1669 GNC modules: 1667 mathematical modules and 2 executable-tool modules.
+- 44,368 theorem declarations (including generated lemmas).
 - 32,762 application theorem declarations, included in those totals.
 - 87 passing library audit, release, cache and planner regression checks.
-- 1,688 source/configuration files identified by SHA-256, including CI workflows.
+- 1,690 source/configuration files identified by SHA-256, including CI workflows.
 
-All 1671 project Lean files live under `GNC/`; four are verification tooling.
+All 1673 project Lean files live under `GNC/`; four are verification tooling.
 Declaration counts include generated lemmas, not just statements in papers.
 The only foundations are `propext`, `Classical.choice` and `Quot.sound`, using
 released Lean 4.29.1 and mathlib v4.29.1. The audit separately recognizes 79
@@ -1264,3 +1264,25 @@ The [cold-build measurement](stt12-cold-build.json) records 185 seconds and
 bound or a hosted CI pass. CI checkpoints each completed large certificate and
 uses Lean's explicit single-worker setting. All proof and regression checks
 remain required.
+
+
+## October 1 shared bias sensitivity and symmetry differentiation
+
+`Lie/EquivariantSensitivity` derives vector and matrix transverse-input
+derivatives from rotational equivariance and actual differentiability. It
+proves the infinitesimal rotation identity, isolates the first input, and
+checks the nonzero-mean tilt formula; equivariance and differentiability
+remain explicit response hypotheses.
+
+`Preintegration/GyroAccelBiasIdentity` identifies the accelerometer-bias
+velocity response from its time ODE, proves its actual parameter derivative,
+and relates it to the genuine spatial gyro-bias rotation derivative. Both
+use the same integrated rotation for any continuous angular-rate history.
+This requires neither FOH nor assumed Jacobian columns. It does not permit
+replacing a finite projected-map Jacobian by the exact-flow Jacobian without
+accounting for their difference.
+
+Both modules are exported through `GNC.Core` and included in the complete
+source-hashed audit. The consuming paper's symbolic generator, C++ graph,
+float32 diagnostics and host timings are separately tested programs, not
+verified machine code. No full-estimator speed or accuracy theorem follows.

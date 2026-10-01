@@ -473,3 +473,6 @@ import GNC.Magnus.FohCssResidualSeries
 import GNC.Preintegration.PhysicalDefectMoments
 import GNC.Preintegration.PhysicalDefectPolynomial
 import GNC.Preintegration.FohSampleCompression
+
+import GNC.Lie.EquivariantSensitivity
+import GNC.Preintegration.GyroAccelBiasIdentity
