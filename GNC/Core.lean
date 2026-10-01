@@ -18,6 +18,8 @@ import GNC.Control.ReactionWheelAllocation
 import GNC.Control.ConstantBurn
 import GNC.Dynamics.PrescribedThrust
 import GNC.Dynamics.SpacecraftGroupAffinity
+import GNC.Dynamics.GravityMismatch
+import GNC.Dynamics.SpacecraftReferenceLog
 import GNC.Dynamics.MatchedAttitude
 import GNC.Analysis.BoxCertificate
 import GNC.Analysis.ParametricBox
