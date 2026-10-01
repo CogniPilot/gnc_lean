@@ -10,7 +10,9 @@ permissions:
 
 concurrency:
   group: verify-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # Let expensive cold checks finish and save their artifacts. A newer commit
+  # waits, then Lake validates and reuses the completed source-matched cache.
+  cancel-in-progress: false
 
 jobs:
   verify:

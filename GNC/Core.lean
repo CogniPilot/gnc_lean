@@ -466,6 +466,7 @@ import GNC.Preintegration.ZeroGyroBias
 import GNC.Analysis.TrigonometricRemainder
 import GNC.Preintegration.CenteredFohBounds
 import GNC.Preintegration.CenteredFohWeightedBounds
+import GNC.Preintegration.CenteredFohConing
 import GNC.Analysis.EuclideanOperatorFrobenius
 import GNC.Preintegration.FohInputError
 import GNC.Magnus.FohCssRemainder

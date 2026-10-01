@@ -5,15 +5,15 @@ and control.** Every included theorem is checked by Lean's kernel under its
 stated hypotheses, with no admitted proofs or additional project axioms.
 
 The [source-hashed record](latest.json) passed on
-2026-10-01T09:22:38.935675+00:00. It covers:
+2026-10-01T11:24:13.754472+00:00. It covers:
 
-- 1690 GNC modules: 1688 mathematical modules and 2 executable-tool modules.
-- 44,597 theorem declarations (including generated lemmas).
+- 1692 GNC modules: 1690 mathematical modules and 2 executable-tool modules.
+- 44,659 theorem declarations (including generated lemmas).
 - 32,991 application theorem declarations, included in those totals.
 - 87 passing library audit, release, cache and planner regression checks.
-- 1,711 source/configuration files identified by SHA-256, including CI workflows.
+- 1,713 source/configuration files identified by SHA-256, including CI workflows.
 
-All 1694 project Lean files live under `GNC/`; four are verification tooling.
+All 1696 project Lean files live under `GNC/`; four are verification tooling.
 Declaration counts include generated lemmas, not just statements in papers.
 The only foundations are `propext`, `Classical.choice` and `Quot.sound`, using
 released Lean 4.29.1 and mathlib v4.29.1. The audit separately recognizes 79
@@ -1290,7 +1290,7 @@ verified machine code. No full-estimator speed or accuracy theorem follows.
 
 ## October 1 full-field certificate memory and complete audit
 
-The current audit reused 1,686 module artifacts and rebuilt four after the
+The preceding audit reused 1,686 module artifacts and rebuilt four after the
 changed certificates had been compiled separately. It covers all 1,690
 mathematical/tool modules, the symmetry and continuous bias identities above,
 and every application certificate. All 87 regression cases passed.
@@ -1316,3 +1316,33 @@ six-module probe observed exactly one/two concurrent compilers with scheduling
 settings one/two. The preceding a966cc0 hosted run failed with exit 143 under
 memory pressure; these local passes do not claim that the next hosted run has
 passed.
+
+
+## October 1 compact centered-FOH coning construction
+
+`Analysis/OrderedQuadratic` proves an exact finite identity for every continuous
+right-flow generator in a real complete normed algebra. The first two ordered
+insertions equal the accumulated generator, its half square and the integrated
+commutator, with the sign fixed by the right-flow convention. This is a finite
+rewrite, not an assertion that the general exact flow terminates.
+
+`Preintegration/CenteredFohConing` derives the residual vector from the actual
+mean-removed FOH gyro generator, commutes the hat map with integration and
+identifies the cross-product coning term. It proves that the compact formula
+is exactly the same raw rotation approximant used inside the attitude,
+velocity and position predictions. `compact_physical_remainder` transfers the
+complete physical endpoint bounds directly from the original FOH ODEs and
+initial conditions, including the accumulated slope and remaining-time
+weights. It introduces no assumed predictor identity or extra error allowance.
+
+The first audit of these additions reused 1,689 module artifacts and rebuilt
+three. The final source-matched audit, including the CI scheduling change,
+reused all 1,692 mathematical/tool modules and released dependency proofs. Both new modules are exported through `GNC.Core`.
+The finite matrix is generally not orthogonal. Quaternion repair, generated
+scalar expressions, floating-point evaluation and firmware are separate
+implementation evidence; these proofs do not silently verify those layers.
+
+CI lets an active cold run finish and cache its checked artifacts when a newer
+commit arrives. The newer run queues and Lake validates the completed cache
+against its own sources. This scheduling change neither skips checks nor
+claims that a queued or unfinished hosted run has passed.
