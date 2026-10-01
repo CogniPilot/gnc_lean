@@ -5,13 +5,13 @@ and control.** Every included theorem is checked by Lean's kernel under its
 stated hypotheses, with no admitted proofs or additional project axioms.
 
 The [source-hashed record](latest.json) passed on
-2026-10-01T05:24:14.408371+00:00. It covers:
+2026-10-01T06:46:13.844589+00:00. It covers:
 
 - 1667 GNC modules: 1665 mathematical modules and 2 executable-tool modules.
-- 43,222 theorem declarations (including generated lemmas).
-- 31,643 application theorem declarations, included in those totals.
+- 44,341 theorem declarations (including generated lemmas).
+- 32,762 application theorem declarations, included in those totals.
 - 87 passing library audit, release, cache and planner regression checks.
-- 1,687 source/configuration files identified by SHA-256, including CI workflows.
+- 1,688 source/configuration files identified by SHA-256, including CI workflows.
 
 All 1671 project Lean files live under `GNC/`; four are verification tooling.
 Declaration counts include generated lemmas, not just statements in papers.
@@ -1248,5 +1248,19 @@ resource/cache changes, not a waiver of any proof or regression check.
 
 The complete local audit passed again against this exact workflow snapshot.
 All 1667 mathematical/tool modules were reused after Lake trace checks;
-43,222 theorem declarations and all 87 regressions remain covered. The new
+44,341 theorem declarations and all 87 regressions remain covered. The new
 hosted run must still pass before claiming hosted CI is green.
+
+
+## October 1 cold certificate build
+
+The current whole-library audit reused 1,664 module artifacts and rebuilt three.
+The changed STT8/time-degree-12 certificate was separately compiled before the
+audit. Its public prediction, hypotheses and exact error budgets are unchanged;
+individual Bernstein proposals/reconstructions are now checked in separate
+kernel proofs. The larger theorem count includes those generated helper lemmas.
+The [cold-build measurement](stt12-cold-build.json) records 185 seconds and
+5,145,688 KiB peak resident memory on this host; it is not a worst-case resource
+bound or a hosted CI pass. CI checkpoints each completed large certificate and
+uses Lean's explicit single-worker setting. All proof and regression checks
+remain required.

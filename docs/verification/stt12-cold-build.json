@@ -1,0 +1,12 @@
+{
+  "status": "passed",
+  "recorded_at_utc": "2026-10-01T06:42:37.028782+00:00",
+  "command": "lake build GNC.Applications.OrbitalComparison.BernsteinData.STT8Time12",
+  "lean_toolchain": "leanprover/lean4:v4.29.1",
+  "module_source_sha256": "8630a261836d94fd477a8cfdee8abc3cd89ad6662ef92883583a58df45b7e55a",
+  "lakefile_sha256": "bf54b8d1a5e87d1ded0c71cdfafa9e4c492e250d2d1d0b3d08630105a2ac84fd",
+  "elapsed_wall_seconds": 185.0,
+  "maximum_resident_kib": 5145688,
+  "exit_status": 0,
+  "scope": "Cold recompilation of this changed certificate with released dependency and unchanged upstream project artifacts reused. Exact original candidate, forcing/envelope coefficients, physical assumptions, prediction statement and budgets retained. Host measurement, not CI success or worst-case resource guarantee."
+}

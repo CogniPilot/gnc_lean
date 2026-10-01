@@ -1,15 +1,15 @@
 {
   "schema_version": 5,
   "status": "passed",
-  "checked_at_utc": "2026-10-01T05:24:14.408371+00:00",
+  "checked_at_utc": "2026-10-01T06:46:13.844589+00:00",
   "lean_toolchain": "leanprover/lean4:v4.29.1",
   "lean_binary": "/nix/store/19vi5pd27jl8ng6awswallrkv8kw1rih-lean-official-4.29.1/bin/lean",
   "library_build": {
     "status": "passed",
     "mode": "incremental",
     "source_modules": 1667,
-    "source_modules_recompiled": 0,
-    "source_modules_reused": 1667,
+    "source_modules_recompiled": 3,
+    "source_modules_reused": 1664,
     "project_cache_reused": true,
     "released_dependency_cache_reused": true
   },
@@ -1683,18 +1683,18 @@
       "GNC.Tools.InitialUncertaintyExport",
       "GNC.Tools.Planner"
     ],
-    "project_declarations": 53017,
+    "project_declarations": 54236,
     "namespace_only_declarations": 0,
-    "library_theorem_declarations": 43222,
-    "library_declarations": 53017,
+    "library_theorem_declarations": 44341,
+    "library_declarations": 54236,
     "compiler_runtime_companions": 79,
     "axioms": [
       "Classical.choice",
       "Quot.sound",
       "propext"
     ],
-    "application_theorem_declarations": 31643,
-    "application_declarations": 37118
+    "application_theorem_declarations": 32762,
+    "application_declarations": 38337
   },
   "audit_regression": {
     "audit_cases": 20,
@@ -1747,7 +1747,7 @@
     }
   },
   "source_sha256": {
-    ".github/workflows/verify.yml": "a8ef200d731a6e26d1486584741619e228f2800429eae9cb84c53f581612dd9c",
+    ".github/workflows/verify.yml": "2fd4bcc3c95cbfe38046d1a046b0f988803e37c41167aacaf08ea529cd07ef52",
     "GNC/Algebra/NilpotentSummation.lean": "90a94d43d5085747cb1276677df16fef9fd594bb859240f0239cb5656104aa75",
     "GNC/All.lean": "32313cf37d9dc184fabcf97a3068fa5304b7fcfa8f8e3f39508d90dac1353925",
     "GNC/Analysis/AffinePolynomialChain.lean": "a6d35950abb2e137b76792fee12197b31242848f58714350fd842618c6e7b624",
@@ -2260,7 +2260,7 @@
     "GNC/Applications/OrbitalComparison/BernsteinData/Circle10.lean": "95a8a642e295b043cfd80a6d4d07379cf264464c1d111aa85d6278db0cd78a62",
     "GNC/Applications/OrbitalComparison/BernsteinData/Circle12.lean": "c44d60b1ea2ad52e6d5095e9e967c87e770c473b8a37dc496017d500cfe040bb",
     "GNC/Applications/OrbitalComparison/BernsteinData/STT8Time10.lean": "f28324d0a6b0fdd4cd790be5643508a91317e390b74071bead3728f5fc0a5c67",
-    "GNC/Applications/OrbitalComparison/BernsteinData/STT8Time12.lean": "8f6ed9932c1ff6a3f051b9a4eb707c80527aec799c2e31ec20365000b32d06f5",
+    "GNC/Applications/OrbitalComparison/BernsteinData/STT8Time12.lean": "8630a261836d94fd477a8cfdee8abc3cd89ad6662ef92883583a58df45b7e55a",
     "GNC/Applications/OrbitalComparison/CartesianCubicPolynomial.lean": "0aec0a77449900a43623cb4100ef2d05ebcf3cbd318a2285f3d0ef068e0fbbbf",
     "GNC/Applications/OrbitalComparison/CartesianErrorPolynomial.lean": "891d18323e7f702a0796171b48d125fcd0a78734be9d25988d1e7077b2c3b8b6",
     "GNC/Applications/OrbitalComparison/CartesianReducedPolynomial.lean": "0b1b484daecdd248286d4a14e7ec5f351c139f3b63a26e8cfaef428d329f302e",
@@ -3419,14 +3419,15 @@
     "GNC/Verification/Policy.lean": "4df9ae3fff623bd2ef3f855c12c7beb3cc1f77c9efb76ff0bd3eebc7bddbc90c",
     "GNC/Verification/Report.lean": "92f8a35be29e7254817adbe0feeeb034bcc380622d329a833d16c9baef551cf0",
     "GNC/Verification.lean": "4ebc5f2174450f2f081048cee1657b279e0bdcb2cea1e3fd252057a8e2c54476",
-    "docs/VERIFICATION.md": "2cf40b555705315fb7c88e72303c92d19ae2556622a4b54930ec548612123e6e",
+    "docs/VERIFICATION.md": "300ac4e69cde5a56609379589ac77d431c022085cd9f32b064b328e6629208d2",
     "flake.lock": "9c987170c639c0b1c2d2c9a65336e8c4b2192a4415d39dcdc411fda4bf57885a",
     "flake.nix": "96e4ca125fd02bff3136cce13e9605decef0fadb1fbc05011468e946432af658",
     "lake-manifest.json": "ca41cc13d6f4d4096950106db2877a64ec9a76977651313da2349671cbfe26a1",
-    "lakefile.toml": "4766873f1135d767d68c5cd6cf25a9e027f548701f4d9ae8691e35d9d630ac8e",
+    "lakefile.toml": "bf54b8d1a5e87d1ded0c71cdfafa9e4c492e250d2d1d0b3d08630105a2ac84fd",
     "lean-toolchain": "7dc000621e0046d1aada809e2b7177e64454645cf4c741e9daaf79c99ec2e7a2",
     "nix/cache-tools.nix": "9e556144b46392b9279465b8cf84703436df951e8ca4e21d5003de284745bd91",
     "nix/lean.nix": "c63b2db7c20c681ff59a1a5e5e0807e0319479649e4681cea15686c7a9c8b54b",
+    "scripts/build_certificate.py": "a6e15f047bdf166910a31e9e80f20e3fd7b3ecba0972919eee12444ddc511f3e",
     "scripts/check_audit.py": "48498776cade3ad4601e9021209929a987f13bdf6dd65898f138980a0b1b41cc",
     "scripts/check_planner.py": "6131dfad5e0739e5a5b6c5943f36ed3f3e771539055f75c9a6e662284ed8d5d9",
     "scripts/check_release.py": "a205c4d50030b2162fd732a9562a65dce3a4dd17ff32afaaa730332c0b9f6d9d",

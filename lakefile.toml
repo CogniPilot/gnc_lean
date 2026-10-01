@@ -2,8 +2,9 @@ name = "gnc"
 version = "0.1.0"
 defaultTargets = ["Verification"]
 # Large exact coefficient records need a deeper elaboration stack. This
-# runtime resource setting preserves Lake's proof-content cache keys.
-weakLeanArgs = ["--tstack=65536"]
+# runtime resource settings preserve Lake's proof-content cache keys.
+# LEAN_NUM_THREADS does not set the released Lean shell's worker count.
+weakLeanArgs = ["--tstack=65536", "--threads=1"]
 
 [[require]]
 name = "mathlib"

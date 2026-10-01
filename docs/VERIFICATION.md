@@ -47,7 +47,15 @@ The library owns its pinned flake and its GitHub Actions workflow. CI runs
 this same command, verifies the generated report's source correspondence,
 and uploads its logs and report. Workflow files are part of the hashed
 snapshot. Separate caches preserve released dependency artifacts and project
-proof artifacts; the build and axiom audit still run on every CI invocation.
+proof artifacts; the build and axiom audit still run on every CI invocation. Each large
+coefficient certificate has a separate checkpoint, so a later runner termination
+does not discard earlier completed proofs. Restored artifacts are still checked
+by Lake against their source/dependency traces; restoring a cache is not a pass.
+Lean's worker limit is set with `--threads=1` in `weakLeanArgs`. The released
+Lean shell does not use `LEAN_NUM_THREADS` for that setting. The time-degree-12
+Bernstein certificate verifies individual exact proposals, reconstructions and
+bounds before assembling the unchanged physical certificate. No native decision
+procedure or relaxed error budget is used.
 
 Use `nix develop --command python scripts/verify.py --fresh` for an explicit
 clean verification. This isolated build starts with no project proof
