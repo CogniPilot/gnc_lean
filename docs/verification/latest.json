@@ -1,15 +1,15 @@
 {
   "schema_version": 5,
   "status": "passed",
-  "checked_at_utc": "2026-10-01T04:23:57.877078+00:00",
+  "checked_at_utc": "2026-10-01T05:24:14.408371+00:00",
   "lean_toolchain": "leanprover/lean4:v4.29.1",
   "lean_binary": "/nix/store/19vi5pd27jl8ng6awswallrkv8kw1rih-lean-official-4.29.1/bin/lean",
   "library_build": {
     "status": "passed",
     "mode": "incremental",
     "source_modules": 1667,
-    "source_modules_recompiled": 2,
-    "source_modules_reused": 1665,
+    "source_modules_recompiled": 0,
+    "source_modules_reused": 1667,
     "project_cache_reused": true,
     "released_dependency_cache_reused": true
   },
@@ -1747,7 +1747,7 @@
     }
   },
   "source_sha256": {
-    ".github/workflows/verify.yml": "654e918be515515e713020160c7a65099d33b73f459edc1f208c8b700dedc181",
+    ".github/workflows/verify.yml": "a8ef200d731a6e26d1486584741619e228f2800429eae9cb84c53f581612dd9c",
     "GNC/Algebra/NilpotentSummation.lean": "90a94d43d5085747cb1276677df16fef9fd594bb859240f0239cb5656104aa75",
     "GNC/All.lean": "32313cf37d9dc184fabcf97a3068fa5304b7fcfa8f8e3f39508d90dac1353925",
     "GNC/Analysis/AffinePolynomialChain.lean": "a6d35950abb2e137b76792fee12197b31242848f58714350fd842618c6e7b624",

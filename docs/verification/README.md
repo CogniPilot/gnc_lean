@@ -5,7 +5,7 @@ and control.** Every included theorem is checked by Lean's kernel under its
 stated hypotheses, with no admitted proofs or additional project axioms.
 
 The [source-hashed record](latest.json) passed on
-2026-10-01T04:23:57.877078+00:00. It covers:
+2026-10-01T05:24:14.408371+00:00. It covers:
 
 - 1667 GNC modules: 1665 mathematical modules and 2 executable-tool modules.
 - 43,222 theorem declarations (including generated lemmas).
@@ -1235,3 +1235,18 @@ acceleration. It proves the $T^3/6$ gyro-to-position coefficient and the
 $3/2$ midpoint sensitivity factor ($9/4$ for its isolated covariance
 contribution). These local identities do not establish full-estimator
 covariance error or a mission-level benefit.
+
+## Hosted build termination and serialized certificates — 1 October 2026
+
+Hosted run 36815114191 built GNC.Core successfully and cached its artifacts,
+but terminated with code 143 during the remaining application build. No Lean
+proof error was reported at that point; the cause is not conclusively identified.
+CI now prebuilds the largest exact coefficient records separately, uses one
+Lean worker for these stages, checkpoints their artifacts before the full audit,
+and logs memory/process information during the remaining build. These are
+resource/cache changes, not a waiver of any proof or regression check.
+
+The complete local audit passed again against this exact workflow snapshot.
+All 1667 mathematical/tool modules were reused after Lake trace checks;
+43,222 theorem declarations and all 87 regressions remain covered. The new
+hosted run must still pass before claiming hosted CI is green.

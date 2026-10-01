@@ -62,16 +62,39 @@ jobs:
           df -h . /nix
       - name: Build general-purpose proofs before application certificates
         id: core-build
-        run: nix develop --command lake build GNC.Core
+        run: nix develop --command env LEAN_NUM_THREADS=1 lake build GNC.Core
       - name: Checkpoint general-purpose proof artifacts
         uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
           path: .lake/build
           key: gnc-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('flake.lock', 'lean-toolchain', 'lakefile.toml') }}-${{ github.sha }}-core-${{ github.run_id }}-${{ github.run_attempt }}
+      # A terminated cold application build did not report a proof error.
+      # Avoid overlapping the largest exact reductions, and retain their
+      # artifacts before loading the complete application environment.
+      - name: Build large exact coefficient certificates separately
+        run: |
+          nix develop --command env LEAN_NUM_THREADS=1 lake build GNC.Applications.OrbitalComparison.PointingCapBernsteinData
+          nix develop --command env LEAN_NUM_THREADS=1 lake build GNC.Applications.OrbitalComparison.BernsteinData.STT8Time10
+          nix develop --command env LEAN_NUM_THREADS=1 lake build GNC.Applications.OrbitalComparison.BernsteinData.STT8Time12
+      - name: Checkpoint exact coefficient proof artifacts
+        uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: .lake/build
+          key: gnc-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('flake.lock', 'lean-toolchain', 'lakefile.toml') }}-${{ github.sha }}-coefficients-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Build every module and audit proofs, dependencies, and regression checks
-        run: nix develop --command python scripts/verify.py
+        run: |
+          (
+            while true; do
+              free -m
+              ps -C lean -o pid,rss,etime,args --sort=-rss | head -n 6
+              sleep 30
+            done
+          ) &
+          gnc_monitor_pid=$!
+          trap 'kill "$gnc_monitor_pid" 2>/dev/null || true' EXIT
+          nix develop --command env LEAN_NUM_THREADS=1 python scripts/verify.py
       - name: Check report against this exact source snapshot
-        run: nix develop --command python scripts/verify.py --check-report .lake/verification/report.json
+        run: nix develop --command env LEAN_NUM_THREADS=1 python scripts/verify.py --check-report .lake/verification/report.json
       # Cache completed modules even after an ordinary build/test failure.
       # Lake checks their input traces on reuse; this is not a verification pass.
       - name: Save complete or partial project proof artifacts
