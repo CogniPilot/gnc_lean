@@ -16,6 +16,8 @@ jobs:
   verify:
     runs-on: ubuntu-24.04
     timeout-minutes: 360
+    env:
+      GNC_VERIFY_STREAM: "1"
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
@@ -25,27 +27,59 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes
       - name: Restore released dependency artifacts
-        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        id: dependencies
+        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
           path: |
             .lake/packages
             .lake/mathlib-cache
           key: mathlib-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('flake.lock', 'lean-toolchain', 'scripts/setup.py') }}
       - name: Restore project proof artifacts
-        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        id: proofs
+        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
           path: .lake/build
-          key: gnc-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('flake.lock', 'lean-toolchain', 'lakefile.toml') }}-${{ github.sha }}
+          key: gnc-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('flake.lock', 'lean-toolchain', 'lakefile.toml') }}-${{ github.sha }}-full-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: |
+            gnc-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('flake.lock', 'lean-toolchain', 'lakefile.toml') }}-${{ github.sha }}-
             gnc-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('flake.lock', 'lean-toolchain', 'lakefile.toml') }}-
       - name: Check the pinned flake
         run: nix flake check --no-build
       - name: Materialize pinned sources and fetch released mathlib proofs
+        id: dependency-setup
         run: nix develop --command gnc-cache
+      - name: Save released proofs before the project build
+        if: steps.dependencies.outputs.cache-hit != 'true'
+        uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: |
+            .lake/packages
+            .lake/mathlib-cache
+          key: ${{ steps.dependencies.outputs.cache-primary-key }}
+      - name: Record runner resources
+        run: |
+          free -h
+          df -h . /nix
+      - name: Build general-purpose proofs before application certificates
+        id: core-build
+        run: nix develop --command lake build GNC.Core
+      - name: Checkpoint general-purpose proof artifacts
+        uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: .lake/build
+          key: gnc-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('flake.lock', 'lean-toolchain', 'lakefile.toml') }}-${{ github.sha }}-core-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Build every module and audit proofs, dependencies, and regression checks
         run: nix develop --command python scripts/verify.py
       - name: Check report against this exact source snapshot
         run: nix develop --command python scripts/verify.py --check-report .lake/verification/report.json
+      # Cache completed modules even after an ordinary build/test failure.
+      # Lake checks their input traces on reuse; this is not a verification pass.
+      - name: Save complete or partial project proof artifacts
+        if: always() && steps.dependency-setup.outcome == 'success'
+        uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: .lake/build
+          key: ${{ steps.proofs.outputs.cache-primary-key }}
       - name: Upload verification evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

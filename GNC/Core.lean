@@ -462,6 +462,7 @@ import GNC.Magnus.FohDegenerateTranslation
 import GNC.Magnus.FohFixedAxisTranslation
 import GNC.Preintegration.SquareZeroTransition
 import GNC.Preintegration.SampleCovariance
+import GNC.Preintegration.ZeroGyroBias
 import GNC.Analysis.TrigonometricRemainder
 import GNC.Preintegration.CenteredFohBounds
 import GNC.Preintegration.CenteredFohWeightedBounds

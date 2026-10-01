@@ -34,6 +34,222 @@ theorem errorFlow_prefix_bound (R : ℝ → SO3) (F G : Vec3)
   rw [mul_pow]
   ring
 
+/-- All nonnegative residual-rotation orders. The PB index is one greater
+than the retained degree; translation integration does not consume that degree. -/
+def commonOrderRotation (F G : Vec3) (m : ℕ) : Op :=
+  Dyson.approx (residual F G) (m+1) 1 * mean F 1
+
+def commonOrderVelocity (F G : Vec3) (T : ℝ) (a₀ a₁ : E3) (m : ℕ) : E3 :=
+  ∫ s in (0 : ℝ)..1, Dyson.approx (residual F G) (m+1) s (transported F T a₀ a₁ s)
+
+def commonOrderPosition (F G : Vec3) (T : ℝ) (a₀ a₁ : E3) (m : ℕ) : E3 :=
+  T • ∫ s in (0 : ℝ)..1, ∫ r in (0 : ℝ)..s,
+    Dyson.approx (residual F G) (m+1) r (transported F T a₀ a₁ r)
+
+/-- The complete weighted translation remainder also covers zero and one
+rotation corrections. No accuracy requirement or trajectory assumption changes. -/
+theorem common_order_weighted_physical_remainder
+    (R : ℝ → SO3) (v p : ℝ → E3) (F G : Vec3) {T : ℝ} (hT : 0 ≤ T)
+    (a₀ a₁ : E3)
+    (hR : ∀ t, HasDerivAt (fun s => rotation (R s))
+      (rotation (R t) * (hat F + (t-1/2) • hat G)) t) (hR₀ : R 0 = 1)
+    (hv : ∀ t, HasDerivAt v (rotation (R t) (acceleration T a₀ a₁ t)) t) (hv₀ : v 0 = 0)
+    (hp : ∀ t, HasDerivAt p (T • v t) t) (hp₀ : p 0 = 0) (m : ℕ) :
+    ‖v 1 - commonOrderVelocity F G T a₀ a₁ m‖ ≤
+      ((enorm G/4)^(m+1) / ((m+1).factorial : ℝ)) * T *
+        Dyson.velocityWeight (m+1) ‖a₀‖ ‖a₁‖ ∧
+    ‖p 1 - commonOrderPosition F G T a₀ a₁ m‖ ≤
+      ((enorm G/4)^(m+1) / ((m+1).factorial : ℝ)) * T^2 *
+        Dyson.positionWeight (m+1) ‖a₀‖ ‖a₁‖ := by
+  let δ := (enorm G/4)^(m+1) / ((m+1).factorial : ℝ)
+  have hvc (t : ℝ) : HasDerivAt (fun s => column (v s))
+      (errorFlow R F t * columnInput F T a₀ a₁ t) t := by
+    have hh := column.hasFDerivAt.comp_hasDerivAt t (hv t)
+    convert hh using 1
+    rw [columnInput, column_mul, transported, ← ContinuousLinearMap.mul_apply, errorFlow_mean]
+  have hpc (t : ℝ) : HasDerivAt (fun s => column (p s)) (T • column (v t)) t := by
+    simpa only [map_smul] using column.hasFDerivAt.comp_hasDerivAt t (hp t)
+  have hrc : Continuous (errorFlow R F) := continuous_iff_continuousAt.mpr
+    (fun t => (errorFlow_derivative R F G hR t).continuousAt)
+  obtain ⟨hvbound, hpbound⟩ := Dyson.translation_weighted_bound
+    (residual F G) (errorFlow R F) (columnInput F T a₀ a₁)
+    (fun t => column (v t)) (fun t => column (p t))
+    (fun t => δ * Dyson.centeredMass t^(m+1))
+    (fun t => T*((1-t)*‖a₀‖+t*‖a₁‖))
+    (residual_continuous F G) hrc (columnInput_continuous F T a₀ a₁)
+    (by fun_prop) (by fun_prop) hvc (by simp [hv₀]) hT
+    (S := 1) (by norm_num) hpc (by simp [hp₀]) (m+1)
+    (fun t ht => errorFlow_prefix_bound R F G hR hR₀ (m+1) ht)
+    (fun t ht => by
+      rw [columnInput, column_norm, transported, mean_rotation, rotation_norm_apply]
+      exact acceleration_norm_le hT a₀ a₁ ht)
+  have hvweight : (∫ t in (0 : ℝ)..1,
+      (δ * Dyson.centeredMass t^(m+1)) * (T*((1-t)*‖a₀‖+t*‖a₁‖))) =
+        δ*T*Dyson.velocityWeight (m+1) ‖a₀‖ ‖a₁‖ := by
+    rw [Dyson.velocityWeight, ← intervalIntegral.integral_const_mul]
+    congr 1
+    funext t
+    ring
+  have hpweight : T * (∫ t in (0 : ℝ)..1,
+      (1-t)*((δ * Dyson.centeredMass t^(m+1)) * (T*((1-t)*‖a₀‖+t*‖a₁‖)))) =
+        δ*T^2*Dyson.positionWeight (m+1) ‖a₀‖ ‖a₁‖ := by
+    calc
+      _ = T*(δ*T*Dyson.positionWeight (m+1) ‖a₀‖ ‖a₁‖) := by
+        congr 1
+        rw [Dyson.positionWeight, ← intervalIntegral.integral_const_mul]
+        congr 1
+        funext t
+        ring
+      _ = _ := by ring
+  rw [hvweight] at hvbound
+  rw [hpweight] at hpbound
+  constructor
+  · have hh := (column (v 1) - Dyson.velocityApprox (residual F G)
+        (columnInput F T a₀ a₁) (m+1) 1).le_opNorm anchor
+    rw [anchor_norm, mul_one] at hh
+    have he := velocity_column_evaluation (residual F G) (transported F T a₀ a₁)
+      (residual_continuous F G) (transported_continuous F T a₀ a₁) (m+1) 1
+    rw [ContinuousLinearMap.sub_apply, column_anchor] at hh
+    change Dyson.velocityApprox (residual F G) (columnInput F T a₀ a₁) (m+1) 1 anchor =
+      commonOrderVelocity F G T a₀ a₁ m at he
+    rw [he] at hh
+    exact hh.trans hvbound
+  · have hh := (column (p 1) - T • Dyson.positionApprox (residual F G)
+        (columnInput F T a₀ a₁) ((m+1)+1) 1).le_opNorm anchor
+    rw [anchor_norm, mul_one] at hh
+    have he := position_column_evaluation (residual F G) (transported F T a₀ a₁)
+      (residual_continuous F G) (transported_continuous F T a₀ a₁) (m+1) 1
+    have he' : (T • Dyson.positionApprox (residual F G)
+        (columnInput F T a₀ a₁) ((m+1)+1) 1) anchor =
+          commonOrderPosition F G T a₀ a₁ m := by
+      change T • (Dyson.positionApprox (residual F G)
+        (fun t => column (transported F T a₀ a₁ t)) ((m+1)+1) 1 anchor) = _
+      rw [he]
+      rfl
+    rw [ContinuousLinearMap.sub_apply, column_anchor, he'] at hh
+    exact hh.trans hpbound
+
+/-- Attitude bound at every common residual degree, including degree zero. -/
+theorem common_order_rotation_remainder
+    (R : ℝ → SO3) (F G : Vec3)
+    (hR : ∀ t, HasDerivAt (fun s => rotation (R s))
+      (rotation (R t) * (hat F + (t-1/2) • hat G)) t) (hR₀ : R 0 = 1) (m : ℕ) :
+    ‖rotation (R 1) - commonOrderRotation F G m‖ ≤
+      (enorm G/4)^(m+1) / ((m+1).factorial : ℝ) := by
+  have he : rotation (R 1) - commonOrderRotation F G m =
+      (errorFlow R F 1 - Dyson.approx (residual F G) (m+1) 1) * mean F 1 := by
+    rw [sub_mul, errorFlow_mean]; rfl
+  rw [he]
+  have hh := errorFlow_prefix_bound R F G hR hR₀ (m+1)
+    (t := 1) ⟨by norm_num, le_rfl⟩
+  apply (norm_mul_le _ _).trans
+  apply (mul_le_mul_of_nonneg_left (mean_norm_le F 1) (norm_nonneg _)).trans
+  simpa only [mul_one, Dyson.centeredMass_one, one_pow] using hh
+
+/-- Sensor-endpoint bounds for every nonnegative correction order. -/
+theorem common_order_weighted_foh_remainder
+    (R : ℝ → SO3) (v p : ℝ → E3) {T : ℝ} (hT : 0 ≤ T)
+    (ω₀ ω₁ : Vec3) (a₀ a₁ : E3)
+    (hR : ∀ t, HasDerivAt (fun s => rotation (R s))
+      (rotation (R t) * hat (T • ((1-t) • ω₀ + t • ω₁))) t) (hR₀ : R 0 = 1)
+    (hv : ∀ t, HasDerivAt v (rotation (R t) (acceleration T a₀ a₁ t)) t) (hv₀ : v 0 = 0)
+    (hp : ∀ t, HasDerivAt p (T • v t) t) (hp₀ : p 0 = 0) (m : ℕ) :
+    ‖rotation (R 1) - commonOrderRotation (meanAngle T ω₀ ω₁) (slopeAngle T ω₀ ω₁) m‖ ≤
+      (T*enorm (ω₁-ω₀)/4)^(m+1) / ((m+1).factorial : ℝ) ∧
+    ‖v 1 - commonOrderVelocity (meanAngle T ω₀ ω₁) (slopeAngle T ω₀ ω₁) T a₀ a₁ m‖ ≤
+      ((T*enorm (ω₁-ω₀)/4)^(m+1) / ((m+1).factorial : ℝ)) * T *
+        Dyson.velocityWeight (m+1) ‖a₀‖ ‖a₁‖ ∧
+    ‖p 1 - commonOrderPosition (meanAngle T ω₀ ω₁) (slopeAngle T ω₀ ω₁) T a₀ a₁ m‖ ≤
+      ((T*enorm (ω₁-ω₀)/4)^(m+1) / ((m+1).factorial : ℝ)) * T^2 *
+        Dyson.positionWeight (m+1) ‖a₀‖ ‖a₁‖ := by
+  have hR' (t : ℝ) : HasDerivAt (fun s => rotation (R s))
+      (rotation (R t) * (hat (meanAngle T ω₀ ω₁) +
+        (t-1/2) • hat (slopeAngle T ω₀ ω₁))) t := by
+    simpa only [sampled_generator] using hR t
+  constructor
+  · simpa only [slopeAngle, enorm_smul, abs_of_nonneg hT] using
+      common_order_rotation_remainder R (meanAngle T ω₀ ω₁)
+        (slopeAngle T ω₀ ω₁) hR' hR₀ m
+  · simpa only [slopeAngle, enorm_smul, abs_of_nonneg hT] using
+      common_order_weighted_physical_remainder R v p
+        (meanAngle T ω₀ ω₁) (slopeAngle T ω₀ ω₁) hT a₀ a₁ hR' hR₀ hv hv₀ hp hp₀ m
+
+/-- Numerical outputs require their own evaluation-distance charge at every
+order; reducing correction degree never waives rounding or projection error. -/
+theorem common_order_weighted_reported_remainder
+    (R : ℝ → SO3) (v p : ℝ → E3) {T : ℝ} (hT : 0 ≤ T)
+    (ω₀ ω₁ : Vec3) (a₀ a₁ : E3)
+    (hR : ∀ t, HasDerivAt (fun s => rotation (R s))
+      (rotation (R t) * hat (T • ((1-t) • ω₀ + t • ω₁))) t) (hR₀ : R 0 = 1)
+    (hv : ∀ t, HasDerivAt v (rotation (R t) (acceleration T a₀ a₁ t)) t) (hv₀ : v 0 = 0)
+    (hp : ∀ t, HasDerivAt p (T • v t) t) (hp₀ : p 0 = 0) (m : ℕ)
+    (Rhat : SO3) (vhat phat : E3) :
+    ‖rotation (R 1) - rotation Rhat‖ ≤
+      (T*enorm (ω₁-ω₀)/4)^(m+1) / ((m+1).factorial : ℝ) +
+      ‖commonOrderRotation (meanAngle T ω₀ ω₁) (slopeAngle T ω₀ ω₁) m - rotation Rhat‖ ∧
+    ‖v 1 - vhat‖ ≤
+      ((T*enorm (ω₁-ω₀)/4)^(m+1) / ((m+1).factorial : ℝ)) * T *
+        Dyson.velocityWeight (m+1) ‖a₀‖ ‖a₁‖ +
+      ‖commonOrderVelocity (meanAngle T ω₀ ω₁) (slopeAngle T ω₀ ω₁) T a₀ a₁ m - vhat‖ ∧
+    ‖p 1 - phat‖ ≤
+      ((T*enorm (ω₁-ω₀)/4)^(m+1) / ((m+1).factorial : ℝ)) * T^2 *
+        Dyson.positionWeight (m+1) ‖a₀‖ ‖a₁‖ +
+      ‖commonOrderPosition (meanAngle T ω₀ ω₁) (slopeAngle T ω₀ ω₁) T a₀ a₁ m - phat‖ := by
+  have h := common_order_weighted_foh_remainder R v p hT ω₀ ω₁ a₀ a₁ hR hR₀ hv hv₀ hp hp₀ m
+  refine ⟨?_, ?_, ?_⟩
+  · exact (norm_sub_le_norm_sub_add_norm_sub _
+      (commonOrderRotation (meanAngle T ω₀ ω₁) (slopeAngle T ω₀ ω₁) m) _).trans
+      (_root_.add_le_add h.1 le_rfl)
+  · exact (norm_sub_le_norm_sub_add_norm_sub _
+      (commonOrderVelocity (meanAngle T ω₀ ω₁) (slopeAngle T ω₀ ω₁) T a₀ a₁ m) _).trans
+      (_root_.add_le_add h.2.1 le_rfl)
+  · exact (norm_sub_le_norm_sub_add_norm_sub _
+      (commonOrderPosition (meanAngle T ω₀ ω₁) (slopeAngle T ω₀ ω₁) T a₀ a₁ m) _).trans
+      (_root_.add_le_add h.2.2 le_rfl)
+
+/-- Frobenius attitude convention for the reported-output theorem at every
+residual degree; both translation norms remain Euclidean. -/
+theorem common_order_weighted_reported_frobenius_remainder
+    (R : ℝ → SO3) (v p : ℝ → E3) {T : ℝ} (hT : 0 ≤ T)
+    (ω₀ ω₁ : Vec3) (a₀ a₁ : E3)
+    (hR : ∀ t, HasDerivAt (fun s => rotation (R s))
+      (rotation (R t) * hat (T • ((1-t) • ω₀ + t • ω₁))) t) (hR₀ : R 0 = 1)
+    (hv : ∀ t, HasDerivAt v (rotation (R t) (acceleration T a₀ a₁ t)) t) (hv₀ : v 0 = 0)
+    (hp : ∀ t, HasDerivAt p (T • v t) t) (hp₀ : p 0 = 0) (m : ℕ)
+    (Rhat : SO3) (vhat phat : E3) :
+    EuclideanOperator.frobenius (rotation (R 1) - rotation Rhat) ≤
+      Real.sqrt 3 * ((T*enorm (ω₁-ω₀)/4)^(m+1) / ((m+1).factorial : ℝ)) +
+      EuclideanOperator.frobenius
+        (commonOrderRotation (meanAngle T ω₀ ω₁) (slopeAngle T ω₀ ω₁) m - rotation Rhat) ∧
+    ‖v 1 - vhat‖ ≤
+      ((T*enorm (ω₁-ω₀)/4)^(m+1) / ((m+1).factorial : ℝ)) * T *
+        Dyson.velocityWeight (m+1) ‖a₀‖ ‖a₁‖ +
+      ‖commonOrderVelocity (meanAngle T ω₀ ω₁) (slopeAngle T ω₀ ω₁) T a₀ a₁ m - vhat‖ ∧
+    ‖p 1 - phat‖ ≤
+      ((T*enorm (ω₁-ω₀)/4)^(m+1) / ((m+1).factorial : ℝ)) * T^2 *
+        Dyson.positionWeight (m+1) ‖a₀‖ ‖a₁‖ +
+      ‖commonOrderPosition (meanAngle T ω₀ ω₁) (slopeAngle T ω₀ ω₁) T a₀ a₁ m - phat‖ := by
+  have h := common_order_weighted_foh_remainder R v p hT ω₀ ω₁ a₀ a₁ hR hR₀ hv hv₀ hp hp₀ m
+  have hr := common_order_weighted_reported_remainder R v p hT ω₀ ω₁ a₀ a₁
+    hR hR₀ hv hv₀ hp hp₀ m Rhat vhat phat
+  exact ⟨EuclideanOperator.reported_bound _ _ _ h.1 le_rfl, hr.2⟩
+
+/-- Zero gyro variation is exact at every common residual degree, including
+zero. The two translation integrations remain present even at degree zero. -/
+theorem common_order_constant_gyro_exact
+    (R : ℝ → SO3) (v p : ℝ → E3) {T : ℝ} (hT : 0 ≤ T)
+    (ω : Vec3) (a₀ a₁ : E3)
+    (hR : ∀ t, HasDerivAt (fun s => rotation (R s))
+      (rotation (R t) * hat (T • ((1-t) • ω + t • ω))) t) (hR₀ : R 0 = 1)
+    (hv : ∀ t, HasDerivAt v (rotation (R t) (acceleration T a₀ a₁ t)) t) (hv₀ : v 0 = 0)
+    (hp : ∀ t, HasDerivAt p (T • v t) t) (hp₀ : p 0 = 0) (m : ℕ) :
+    rotation (R 1) = commonOrderRotation (meanAngle T ω ω) 0 m ∧
+    v 1 = commonOrderVelocity (meanAngle T ω ω) 0 T a₀ a₁ m ∧
+    p 1 = commonOrderPosition (meanAngle T ω ω) 0 T a₀ a₁ m := by
+  have h := common_order_weighted_foh_remainder R v p hT ω ω a₀ a₁
+    hR hR₀ hv hv₀ hp hp₀ m
+  simpa [slopeAngle, enorm, sub_eq_zero] using h
+
 /-- Same physical approximations as `balanced_foh_remainder`; only the
 translation bounds are sharpened. `N+3` is the first omitted residual order.
 No hypotheses about the unknown error or numerical tolerances are added. -/
@@ -50,73 +266,9 @@ theorem balanced_weighted_physical_remainder
     ‖p 1 - predictPosition F G T a₀ a₁ (N+2)‖ ≤
       ((enorm G/4)^(N+3) / ((N+3).factorial : ℝ)) * T^2 *
         Dyson.positionWeight (N+3) ‖a₀‖ ‖a₁‖ := by
-  let δ := (enorm G/4)^(N+3) / ((N+3).factorial : ℝ)
-  have hvc (t : ℝ) : HasDerivAt (fun s => column (v s))
-      (errorFlow R F t * columnInput F T a₀ a₁ t) t := by
-    have hh := column.hasFDerivAt.comp_hasDerivAt t (hv t)
-    convert hh using 1
-    rw [columnInput, column_mul, transported, ← ContinuousLinearMap.mul_apply, errorFlow_mean]
-  have hpc (t : ℝ) : HasDerivAt (fun s => column (p s)) (T • column (v t)) t := by
-    simpa only [map_smul] using column.hasFDerivAt.comp_hasDerivAt t (hp t)
-  have hrc : Continuous (errorFlow R F) := continuous_iff_continuousAt.mpr
-    (fun t => (errorFlow_derivative R F G hR t).continuousAt)
-  obtain ⟨hvbound, hpbound⟩ := Dyson.translation_weighted_bound
-    (residual F G) (errorFlow R F) (columnInput F T a₀ a₁)
-    (fun t => column (v t)) (fun t => column (p t))
-    (fun t => δ * Dyson.centeredMass t^(N+3))
-    (fun t => T*((1-t)*‖a₀‖+t*‖a₁‖))
-    (residual_continuous F G) hrc (columnInput_continuous F T a₀ a₁)
-    (by fun_prop) (by fun_prop) hvc (by simp [hv₀]) hT
-    (S := 1) (by norm_num) hpc (by simp [hp₀]) (N+3)
-    (fun t ht => errorFlow_prefix_bound R F G hR hR₀ (N+3) ht)
-    (fun t ht => by
-      rw [columnInput, column_norm, transported, mean_rotation, rotation_norm_apply]
-      exact acceleration_norm_le hT a₀ a₁ ht)
-  have hvweight : (∫ t in (0 : ℝ)..1,
-      (δ * Dyson.centeredMass t^(N+3)) * (T*((1-t)*‖a₀‖+t*‖a₁‖))) =
-        δ*T*Dyson.velocityWeight (N+3) ‖a₀‖ ‖a₁‖ := by
-    rw [Dyson.velocityWeight, ← intervalIntegral.integral_const_mul]
-    congr 1
-    funext t
-    ring
-  have hpweight : T * (∫ t in (0 : ℝ)..1,
-      (1-t)*((δ * Dyson.centeredMass t^(N+3)) * (T*((1-t)*‖a₀‖+t*‖a₁‖)))) =
-        δ*T^2*Dyson.positionWeight (N+3) ‖a₀‖ ‖a₁‖ := by
-    calc
-      _ = T*(δ*T*Dyson.positionWeight (N+3) ‖a₀‖ ‖a₁‖) := by
-        congr 1
-        rw [Dyson.positionWeight, ← intervalIntegral.integral_const_mul]
-        congr 1
-        funext t
-        ring
-      _ = _ := by ring
-  rw [hvweight] at hvbound
-  rw [hpweight] at hpbound
-  constructor
-  · have hh := (column (v 1) - Dyson.velocityApprox (residual F G)
-        (columnInput F T a₀ a₁) (N+3) 1).le_opNorm anchor
-    rw [anchor_norm, mul_one] at hh
-    have he := velocity_column_evaluation (residual F G) (transported F T a₀ a₁)
-      (residual_continuous F G) (transported_continuous F T a₀ a₁) (N+3) 1
-    rw [ContinuousLinearMap.sub_apply, column_anchor] at hh
-    change Dyson.velocityApprox (residual F G) (columnInput F T a₀ a₁) (N+3) 1 anchor =
-      predictVelocity F G T a₀ a₁ (N+1) at he
-    rw [he] at hh
-    exact hh.trans hvbound
-  · have hh := (column (p 1) - T • Dyson.positionApprox (residual F G)
-        (columnInput F T a₀ a₁) ((N+3)+1) 1).le_opNorm anchor
-    rw [anchor_norm, mul_one] at hh
-    have he := position_column_evaluation (residual F G) (transported F T a₀ a₁)
-      (residual_continuous F G) (transported_continuous F T a₀ a₁) (N+3) 1
-    have he' : (T • Dyson.positionApprox (residual F G)
-        (columnInput F T a₀ a₁) ((N+3)+1) 1) anchor =
-          predictPosition F G T a₀ a₁ (N+2) := by
-      change T • (Dyson.positionApprox (residual F G)
-        (fun t => column (transported F T a₀ a₁ t)) ((N+3)+1) 1 anchor) = _
-      rw [he]
-      rfl
-    rw [ContinuousLinearMap.sub_apply, column_anchor, he'] at hh
-    exact hh.trans hpbound
+  simpa only [commonOrderVelocity, commonOrderPosition, predictVelocity, predictPosition,
+    Nat.add_assoc] using
+    common_order_weighted_physical_remainder R v p F G hT a₀ a₁ hR hR₀ hv hv₀ hp hp₀ (N+2)
 
 /-- Sample-based weighted theorem, including the unchanged attitude bound. -/
 theorem balanced_weighted_foh_remainder

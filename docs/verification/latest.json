@@ -1,15 +1,15 @@
 {
   "schema_version": 5,
   "status": "passed",
-  "checked_at_utc": "2026-09-30T22:46:41.988241+00:00",
+  "checked_at_utc": "2026-10-01T04:23:57.877078+00:00",
   "lean_toolchain": "leanprover/lean4:v4.29.1",
   "lean_binary": "/nix/store/19vi5pd27jl8ng6awswallrkv8kw1rih-lean-official-4.29.1/bin/lean",
   "library_build": {
     "status": "passed",
     "mode": "incremental",
-    "source_modules": 1666,
+    "source_modules": 1667,
     "source_modules_recompiled": 2,
-    "source_modules_reused": 1664,
+    "source_modules_reused": 1665,
     "project_cache_reused": true,
     "released_dependency_cache_reused": true
   },
@@ -1679,13 +1679,14 @@
       "GNC.Preintegration.SampleCovariance",
       "GNC.Preintegration.SampleSensitivity",
       "GNC.Preintegration.SquareZeroTransition",
+      "GNC.Preintegration.ZeroGyroBias",
       "GNC.Tools.InitialUncertaintyExport",
       "GNC.Tools.Planner"
     ],
-    "project_declarations": 52980,
+    "project_declarations": 53017,
     "namespace_only_declarations": 0,
-    "library_theorem_declarations": 43189,
-    "library_declarations": 52980,
+    "library_theorem_declarations": 43222,
+    "library_declarations": 53017,
     "compiler_runtime_companions": 79,
     "axioms": [
       "Classical.choice",
@@ -1700,7 +1701,7 @@
     "status": "passed"
   },
   "release_regression": {
-    "release_cases": 22,
+    "release_cases": 24,
     "status": "passed"
   },
   "planner_regression": {
@@ -1746,7 +1747,7 @@
     }
   },
   "source_sha256": {
-    ".github/workflows/verify.yml": "e90d82b565c7789284abc39e32174b516dad6b45c1cc17f5d3273bdd547bc8fb",
+    ".github/workflows/verify.yml": "654e918be515515e713020160c7a65099d33b73f459edc1f208c8b700dedc181",
     "GNC/Algebra/NilpotentSummation.lean": "90a94d43d5085747cb1276677df16fef9fd594bb859240f0239cb5656104aa75",
     "GNC/All.lean": "32313cf37d9dc184fabcf97a3068fa5304b7fcfa8f8e3f39508d90dac1353925",
     "GNC/Analysis/AffinePolynomialChain.lean": "a6d35950abb2e137b76792fee12197b31242848f58714350fd842618c6e7b624",
@@ -3126,7 +3127,7 @@
     "GNC/Control/StandardBackstepping.lean": "37888600d8abb7ac69940d06dabc20538767d5b58e36132a17ff526b2ac4bbd0",
     "GNC/Control/ThrustIntegral.lean": "8978779bd93a7172d44aaeaba705451e2a258bfd5f363698665c028c776580a1",
     "GNC/Control/ThrustSupport.lean": "4778f39997cf03d9e71548734422743147886bf7a8ba1281a84d11f4725db6aa",
-    "GNC/Core.lean": "1ec33ca41d602090a3172bf74a79e8d8fe95de240b35413905ed0163addfec2a",
+    "GNC/Core.lean": "6332549eaef9f0ab05a6c2adce9ff65f7a4055c7216b98a37c9b112cc8e8164f",
     "GNC/Dynamics/AngularRateError.lean": "e2009aae917c748b0737aa0acfa8cd3f06c44eb38bf017c820f21fcff1b04fca",
     "GNC/Dynamics/Atmosphere.lean": "1264b3681524fd659eb3a08c03bfcfdeca92d681a453ced743022339951a4f86",
     "GNC/Dynamics/CandidateOrbitExistence.lean": "19c559b9469a975b21a3a4abba2da191dde94d7ed1701f636ba17c0cf8124a18",
@@ -3334,7 +3335,7 @@
     "GNC/Magnus/FohCotangentLimits.lean": "f355e30aa830559bac1081305cb3d046c829e638a5d34fe15e3ff32ed873816f",
     "GNC/Magnus/FohCssEquivalence.lean": "e0b9f909871596d22750103490ed7686d521a42d016d7eb2da2ae51dbb64594b",
     "GNC/Magnus/FohCssRemainder.lean": "9e14fd6df467313da7748ad5b54b5429d52465f36385c3232f9996865247c1f9",
-    "GNC/Magnus/FohCssResidualSeries.lean": "2d687f650b16e0c270f3129d138db3a7b696a8c1d8e3a7f9b6f085ba5a2a52f3",
+    "GNC/Magnus/FohCssResidualSeries.lean": "8a0d290a4ad63a54f100fa9dd493d0a4fec034da946fd043d5d6f5ed19d6e615",
     "GNC/Magnus/FohDefectCertificate.lean": "47e773acdcf141503d0abc9b898a43d69c108c887d008ca5961d9a7593a7dab4",
     "GNC/Magnus/FohDegenerateTranslation.lean": "17d948c733fb06de98ae4923c5951d84d19ff8afe4925e73312835e69f499d86",
     "GNC/Magnus/FohDegreeFifteen.lean": "722db3b58300ce0b806d753ce3ce5d2f2d8c2f5ea928332c734ebbab2a318fd3",
@@ -3399,18 +3400,19 @@
     "GNC/Planning/PolynomialKernel.lean": "817f90a433e833557f4c29be6dea3a59daba01a0db485f5625bad3f77797b23a",
     "GNC/Planning/SmoothStep.lean": "ee699136d50d3a93df25ba9ddde6f0b1b1d98959c638febebe1d353902043a80",
     "GNC/Preintegration/CenteredFohBounds.lean": "b69b3cc2dc4140c804dbc7ee84c9cfd019b541fc61536108e1623eed020520ee",
-    "GNC/Preintegration/CenteredFohWeightedBounds.lean": "f2bfdf38ed7b58f695e76b0c0d611669df38fb962a0b69bb2d73480372f7be2e",
+    "GNC/Preintegration/CenteredFohWeightedBounds.lean": "a6fd7b708a949eaa23ca46ad0340f31da6ac2e31825c68a0fb433c6c7ceda860",
     "GNC/Preintegration/ClosedForm.lean": "51538499636dd994891fc62d34e983579bbedf8f1da155b0055a4a345bfb5ca2",
     "GNC/Preintegration/EndpointTransition.lean": "4444818ae47415204dd6cebd674bc11cbe3598295a0664c633d5ebfc8f2f2af9",
     "GNC/Preintegration/ErrorDynamics.lean": "b84d65e5bf4b7e55ea803dae1c9e839548ca5669fe5e549be9ba06734c13f70c",
     "GNC/Preintegration/FohInputError.lean": "a5c5397299b30ac5d3d404ad2d93133b39490a0f1e646e79c7a2eb23eb60c84d",
-    "GNC/Preintegration/FohSampleCompression.lean": "eac469318aa9710873b11e8832759071223b710e46e740561549b5dc538c5448",
+    "GNC/Preintegration/FohSampleCompression.lean": "8aa7febd5c05b5f47cf242908d7102f17706973f0331a221cd3aadfea38efd83",
     "GNC/Preintegration/PhysicalDefect.lean": "11838c730eda46fb8599180ef34e680f7300e64210d4856d4728e5ba5a6946b5",
     "GNC/Preintegration/PhysicalDefectMoments.lean": "3010545d57f5a91a1da788eb2f4d4f6d5291f54426d8f5fc7091b027c6defa1a",
     "GNC/Preintegration/PhysicalDefectPolynomial.lean": "17eabbca06a57142f41ee74bd6bdf5dad3c4bbb94ff5ee3cebbfc4e3e98518e4",
     "GNC/Preintegration/SampleCovariance.lean": "f9fc4aac28023d91181dd0ca8299c7c1129c78f68737b60984071b6342074603",
     "GNC/Preintegration/SampleSensitivity.lean": "bd3c2784a3b0117f4043cf43c932e65ba884606c6a30bbbd90de52238d1e7dca",
     "GNC/Preintegration/SquareZeroTransition.lean": "4b3b440d47ee559b2e4a850cf8c69025b87c0ea4edcce5860d5cd69898a78b03",
+    "GNC/Preintegration/ZeroGyroBias.lean": "4667ab0f29ec4a29d19fe3e4c7b35426ce2f8e3b7257bcfc24f193114599b0eb",
     "GNC/Tools/InitialUncertaintyExport.lean": "2f893636f6414bcc7db61b07efacef21684f934b6e0c4d1616693e4245b06293",
     "GNC/Tools/Planner.lean": "a30c4c5f86bd917b6aa7b96e021b2538b5587902a11a8ba64e0fe596d59b6f0e",
     "GNC/Verification/Audit.lean": "45316f1dae7f31e7d27a7e7b323c678a12f77bc8ad1ed442fec18eecc2fc46a5",
@@ -3427,11 +3429,11 @@
     "nix/lean.nix": "c63b2db7c20c681ff59a1a5e5e0807e0319479649e4681cea15686c7a9c8b54b",
     "scripts/check_audit.py": "48498776cade3ad4601e9021209929a987f13bdf6dd65898f138980a0b1b41cc",
     "scripts/check_planner.py": "6131dfad5e0739e5a5b6c5943f36ed3f3e771539055f75c9a6e662284ed8d5d9",
-    "scripts/check_release.py": "5f81a35796dfb2a4aa213ef2377fa9243a78e6caf03e813ae1bc3dbd592787e1",
+    "scripts/check_release.py": "a205c4d50030b2162fd732a9562a65dce3a4dd17ff32afaaa730332c0b9f6d9d",
     "scripts/check_repository.py": "fedfb27b7d623043bb07e48f79c2b54a6b8186189e50be825d547bd6c919bae3",
     "scripts/check_structure.py": "57e9f65f353111762bd7da60324b1eaad81a6e3726f255dba9d2740418a32b2f",
     "scripts/setup.py": "a85174eb529ec8270b476f772b2e0741df34275607f4e45ab99e53b3d85413b3",
-    "scripts/verify.py": "13408a4aa1d8836151f14c1f41905203d77c79a8579e31ac17a750d2439244dc"
+    "scripts/verify.py": "2885a8407485293b48ba395b1c0ea96ae41501a0cc5099749de6c179b2567098"
   },
   "claim": "All GNC theorem declarations are kernel-checked under their stated hypotheses.",
   "exclusions": [

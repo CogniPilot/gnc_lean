@@ -76,6 +76,49 @@ theorem cssErrorFive_constant_gyro (w a b : Vec3) :
   fin_cases i <;> fin_cases j <;>
     simp [crossProduct, vecHead, vecTail] <;> ring
 
+set_option maxHeartbeats 4000000 in
+open Matrix in
+/-- The next constant-gyro coefficient is also purely translational.
+In particular, constant gyro does not make the affine-accelerometer
+corrections terminate at time degree five. -/
+theorem cssErrorSix_constant_gyro (w a b : Vec3) :
+    cssErrorSix (extended ![0,a,w] 1) (extended ![0,b,0] 0) =
+      extended ![(1/720:ℝ) • crossProduct w (crossProduct w (crossProduct w b)),
+        -(1/1440:ℝ) • crossProduct w (crossProduct w (crossProduct w
+          (crossProduct w b))), 0] 0 := by
+  have hc : comm (extended ![0,a,w] 1) (extended ![0,b,0] 0) =
+      extended ![-b, crossProduct w b, 0] 0 := by
+    simpa [comm, crossProduct] using foh_commutator w a 0 b
+  have hz : comm (extended ![0,b,0] 0)
+      (extended ![-b,crossProduct w b,0] 0) = 0 := by
+    rw [comm, extended_commutator]
+    ext i j
+    fin_cases i <;> fin_cases j <;>
+      simp [extendedBracket, ad, extended, hat, crossProduct]
+  unfold cssErrorSix
+  rw [cssErrorFive_constant_gyro, hc, hz]
+  simp only [comm, mul_zero, zero_mul, sub_self, smul_zero, sub_zero]
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [extended, kinematicC, hat, crossProduct, Matrix.mul_apply,
+      Matrix.vecMul, dotProduct, Fin.sum_univ_succ] <;> ring
+
+/-- A bound on the entire residual gives both upper and lower bounds on
+the original error. A positive lower bound certifies that the retained
+corrections really do miss a nonzero physical effect. This lemma also
+applies separately to rotation, velocity and position norms. -/
+theorem residual_norm_enclosure {V : Type*} [NormedAddCommGroup V]
+    (error leading : V) {tail : ℝ} (h : ‖error - leading‖ ≤ tail) :
+    max 0 (‖leading‖ - tail) ≤ ‖error‖ ∧
+      ‖error‖ ≤ ‖leading‖ + tail := by
+  constructor
+  · apply max_le (norm_nonneg error)
+    have hl := norm_sub_norm_le leading error
+    rw [norm_sub_rev leading error] at hl
+    linarith
+  · have hu := norm_sub_le_norm_sub_add_norm_sub error leading 0
+    simpa only [sub_zero, add_comm] using hu.trans (add_le_add h le_rfl)
+
 section Analytic
 variable {A : Type*} [NormedRing A] [NormedAlgebra ℝ A] [CompleteSpace A]
 
@@ -173,6 +216,24 @@ theorem corrected_exponential_higher_coefficient_remainder [NormOneClass A]
   apply (corrected_exponential_higher_remainder a b Y n m hT hY0 hY hr hm).trans
   exact add_le_add (add_le_add (AlgebraPolynomial.norm_value_le _
     (show |T| ≤ T by rw [abs_of_nonneg hT])) le_rfl) le_rfl
+
+/-- Input-dependent two-sided enclosure of the original corrected-ZOH
+error, accounting for every time degree after the two retained errors. -/
+theorem corrected_exponential_error_enclosure [NormOneClass A]
+    (a b : A) (Y : ℝ → A) (n m : ℕ) {T r : ℝ}
+    (hT : 0 ≤ T) (hY0 : Y 0 = 1)
+    (hY : ∀ t ∈ Icc 0 T, HasDerivAt Y (Y t * (a + t • b)) t)
+    (hr : ‖fohRetainedExponent a b T‖ ≤ r) (hm : r < m + 1) :
+    let leading := T^5 • cssErrorFive a b + T^6 • cssErrorSix a b
+    let tail := ‖AlgebraPolynomial.value (cssHigherDifference a b n m) T‖ +
+      Real.exp ((‖a‖ + T * ‖b‖) * T) * (fohDefectRadius a b n T * T) +
+      fohExpTail r m
+    max 0 (‖leading‖ - tail) ≤
+        ‖Y T - NormedSpace.exp (fohRetainedExponent a b T)‖ ∧
+      ‖Y T - NormedSpace.exp (fohRetainedExponent a b T)‖ ≤
+        ‖leading‖ + tail := by
+  exact residual_norm_enclosure _ _
+    (corrected_exponential_higher_remainder a b Y n m hT hY0 hY hr hm)
 
 end Analytic
 end GNC.Magnus

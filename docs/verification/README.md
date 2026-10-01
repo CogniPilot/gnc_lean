@@ -5,18 +5,18 @@ and control.** Every included theorem is checked by Lean's kernel under its
 stated hypotheses, with no admitted proofs or additional project axioms.
 
 The [source-hashed record](latest.json) passed on
-2026-09-29T21:55:09.379046+00:00. It covers:
+2026-10-01T04:23:57.877078+00:00. It covers:
 
-- 1605 GNC modules: 1603 mathematical modules and two executable-tool modules.
-- 38,700 theorem declarations (including generated lemmas).
-- 31,641 application theorem declarations, included in those totals.
-- 85 passing library audit, release, cache and planner regression checks.
-- 1,625 source/configuration files identified by SHA-256, including CI workflows.
+- 1667 GNC modules: 1665 mathematical modules and 2 executable-tool modules.
+- 43,222 theorem declarations (including generated lemmas).
+- 31,643 application theorem declarations, included in those totals.
+- 87 passing library audit, release, cache and planner regression checks.
+- 1,687 source/configuration files identified by SHA-256, including CI workflows.
 
-All 1609 project Lean files live under `GNC/`; four are verification tooling.
+All 1671 project Lean files live under `GNC/`; four are verification tooling.
 Declaration counts include generated lemmas, not just statements in papers.
 The only foundations are `propext`, `Classical.choice` and `Quot.sound`, using
-released Lean 4.29.1 and mathlib v4.29.1. The audit separately recognizes 70
+released Lean 4.29.1 and mathlib v4.29.1. The audit separately recognizes 79
 Lean-generated runtime companions.
 
 ## September 29 cascade and FOH additions
@@ -45,8 +45,9 @@ This complete audit covers the library after separating it into its own
 repository. All application proofs remain covered. Paper experiment programs
 and their numerical comparison tests now belong to the consuming papers
 repository, so their former counts are not part of the library regression
-total or source-hash inventory. The final audit reused 1603 module artifacts
-and rebuilt 2. The new vanishing gravity-coefficient and regional BIBO proofs,
+total or source-hash inventory. The current incremental audit reused 1665
+module artifacts and rebuilt 2; released dependency proofs were reused too.
+The new vanishing gravity-coefficient and regional BIBO proofs,
 including the disturbance-budget optimization, are covered. The
 mounting-error and noncircular-reference/response modules were
 built before that audit and their cached artifacts were checked for reuse. The nonzero-initial uncertainty containment and existence
@@ -1191,3 +1192,46 @@ certificate evaluator without reconstructing the exact flow. The numerical
 Python interval evaluator, generated CSE graph and benchmark outputs retain
 their separate validation status; no executable floating-point correctness
 claim is implied by the kernel-checked mathematical theorems.
+
+`FohCssResidualSeries` additionally proves the constant-gyro sixth physical
+error coefficient: velocity `-hat(w)^4 b / 1440` and position
+`hat(w)^3 b / 720`. Its `residual_norm_enclosure` turns a whole-tail bound
+into a two-sided bound on the original error norm, and
+`corrected_exponential_error_enclosure` applies this to the actual FOH flow
+minus the specified corrected-log/ZOH exponential. These are exact
+coefficient identities and guaranteed bounds; they do not assert that a
+general FOH Magnus series terminates or that an upper bound is the exact
+worst-case error. The CI workflow now checkpoints completed proof artifacts
+and exposes live build logs; an infrastructure termination does not constitute
+a mathematical proof failure or a hosted verification pass.
+
+`FohSampleCompression` now retains each fine hold's two endpoint discrepancies
+rather than replacing them by a packet-wide maximum. It proves the Euclidean
+chord envelope, the actual SO(3)/velocity/position affine-input replacement
+bounds, their comparison with uniform bounds, and monotonicity of the prefix
+composition step. The position bound gives earlier input errors a larger
+weight. All five additions are included in the current source-hashed audit.
+The consuming paper's outward-rounded evaluator and native compression study
+are independently tested numerical programs; they are outside the Lean kernel
+claim and do not establish an onboard implementation or speedup.
+
+The current audit also includes `affine_discrepancy_endpoint_rewrite`, the
+exact shared-offset/slope-difference identity used before numerical enclosure
+in the paper's native sample-replacement checker. All project proof artifacts
+and released dependency artifacts were reused during the successful final
+audit. A prior verification process was terminated with exit 143; the one-thread
+retry completed. This is local evidence, not a hosted CI pass. Native adjacent-
+float arithmetic and timing tests remain outside the mathematical kernel claim.
+
+The latest FOH update additionally checks six named arbitrary-degree
+physical/sample/reported-error results in `CenteredFohWeightedBounds`.
+Degree zero and one require no stronger ODE or envelope hypotheses; the
+constant-gyro limit is exact at every residual degree. Numerical prototypes
+and the prescribed-roll comparison remain separately tested paper programs.
+
+`ZeroGyroBias` identifies the constant-bias polynomial with the actual
+perturbed exponential derivative at zero nominal gyro and constant body
+acceleration. It proves the $T^3/6$ gyro-to-position coefficient and the
+$3/2$ midpoint sensitivity factor ($9/4$ for its isolated covariance
+contribution). These local identities do not establish full-estimator
+covariance error or a mission-level benefit.

@@ -10,8 +10,11 @@ from pathlib import Path
 import tempfile
 from unittest import TestCase, TestLoader, TextTestRunner
 import sys
+import contextlib
+import io
+from unittest.mock import patch
 
-from verify import check_module_coverage, check_report, source_hashes
+from verify import check_module_coverage, check_report, source_hashes, run
 from check_structure import structure_errors
 
 
@@ -37,6 +40,30 @@ class ReleaseTests(TestCase):
 
     def test_matching_snapshot(self):
         self.assertEqual(check_report(self.record, self.root)["status"], "source snapshot matches")
+
+    def test_live_build_logging_preserves_machine_readable_stdout(self):
+        logs = self.root/'logs'
+        logs.mkdir()
+        console = io.StringIO()
+        command = [sys.executable, '-c',
+                   'import sys; print("{\\"status\\":\\"passed\\"}"); '
+                   'print("diagnostic on stderr", file=sys.stderr)']
+        with patch('verify.OUTPUT', logs), patch.dict('os.environ', {'GNC_VERIFY_STREAM': '1'}), \
+                contextlib.redirect_stdout(console):
+            output = run('library', command, cwd=self.root)
+        self.assertEqual(json.loads(output), {'status': 'passed'})
+        self.assertIn('"passed"', console.getvalue())
+        self.assertIn('diagnostic on stderr', (logs/'library.log').read_text())
+
+    def test_live_build_logging_rejects_failed_command(self):
+        logs = self.root/'logs'
+        logs.mkdir()
+        with patch('verify.OUTPUT', logs), patch.dict('os.environ', {'GNC_VERIFY_STREAM': '1'}), \
+                contextlib.redirect_stdout(io.StringIO()):
+            with self.assertRaisesRegex(RuntimeError, 'library failed'):
+                run('library', [sys.executable, '-c',
+                               'import sys; print("compiler failure"); sys.exit(2)'], cwd=self.root)
+        self.assertIn('compiler failure', (logs/'library.log').read_text())
 
     def test_changed_proof(self):
         (self.root / "GNC/Example.lean").write_text("changed\n")

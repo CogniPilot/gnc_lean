@@ -14,6 +14,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import tempfile
+import threading
 
 ROOT = Path(__file__).resolve().parent.parent
 OUTPUT = ROOT / ".lake/verification"
@@ -54,8 +55,33 @@ def run(label, command, cwd=ROOT):
     print(f"Checking {label}…", flush=True)
     log_path = OUTPUT / (label + ".log")
     error_path = OUTPUT / (label + ".stderr.log")
-    with log_path.open("w") as stdout, error_path.open("w") as stderr:
-        process = subprocess.run(command, cwd=cwd, stdout=stdout, stderr=stderr, text=True)
+    # Retain complete evidence locally, but expose Lake progress in CI.
+    # Previously a cold build produced no console output for over 30 minutes.
+    stream = os.environ.get("GNC_VERIFY_STREAM") == "1"
+    done = threading.Event()
+
+    def heartbeat():
+        while not done.wait(60):
+            print(f"Still checking {label}; full log: {log_path}", flush=True)
+
+    monitor = threading.Thread(target=heartbeat, daemon=True) if stream else None
+    if monitor is not None:
+        monitor.start()
+    try:
+        with log_path.open("w") as stdout, error_path.open("w") as stderr:
+            process = subprocess.Popen(command, cwd=cwd, stdout=subprocess.PIPE,
+                                       stderr=stderr, text=True)
+            for line in process.stdout:
+                stdout.write(line)
+                stdout.flush()
+                if stream and label.startswith("library"):
+                    print(line, end="", flush=True)
+            process.stdout.close()
+            process.wait()
+    finally:
+        done.set()
+        if monitor is not None:
+            monitor.join()
     output = log_path.read_text()
     with log_path.open("a") as stream:
         stream.write(error_path.read_text())
@@ -93,7 +119,13 @@ def check_library(workspace, *, fresh):
                  (module.replace(".", "/") + ".olean") for module in modules}
     before = {module: path.stat().st_mtime_ns for module, path in artifacts.items()
               if path.is_file()}
-    run("library", ["lake", "build", "Verification"], cwd=workspace)
+    # Each whole-library audit loads the complete mathematical environment.
+    # Building Audit and Report together made Lake run two ~6 GB processes
+    # concurrently. Keep the same checks, but run those targets sequentially.
+    run("library", ["lake", "build", "GNC.All", "GNC.Tools.Planner"], cwd=workspace)
+    run("library-audit", ["lake", "build", "Verification.Audit"], cwd=workspace)
+    run("library-report", ["lake", "build", "Verification.Report"], cwd=workspace)
+    run("library-final", ["lake", "build", "Verification"], cwd=workspace)
     for module, artifact in artifacts.items():
         assert artifact.is_file(), f"Build omitted {module}"
     reused = sum(before.get(module) == path.stat().st_mtime_ns

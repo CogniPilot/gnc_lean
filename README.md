@@ -75,6 +75,13 @@ does not skip the build or the axiom audit. The workflow pins action revisions
 and requires no publishing credentials. A hosted CI pass is a separate piece
 of evidence from a locally generated verification record.
 
+CI saves released artifacts immediately after setup and checkpoints the core
+proof build before application certificates. It also saves completed project
+artifacts after ordinary failures, so a retry can resume. An abrupt runner
+shutdown can prevent final uploads; a saved partial cache is not a passing
+verification record. `GNC_VERIFY_STREAM=1` exposes live Lake output and a
+minute-by-minute heartbeat while retaining full logs for the final audit.
+
 ## Applications and papers
 
 Notable results and limits are described in the [library overview](GNC/README.md),
