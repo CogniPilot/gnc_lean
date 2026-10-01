@@ -122,7 +122,12 @@ def check_library(workspace, *, fresh):
     # Each whole-library audit loads the complete mathematical environment.
     # Building Audit and Report together made Lake run two ~6 GB processes
     # concurrently. Keep the same checks, but run those targets sequentially.
-    run("library", ["lake", "build", "GNC.All", "GNC.Tools.Planner"], cwd=workspace)
+    library_command = ["lake", "build", "GNC.All", "GNC.Tools.Planner"]
+    if os.environ.get("GNC_SERIAL_BUILD") == "1":
+        # Set this after entering the flake shell, which otherwise defaults to 2.
+        # Lake honors it for compiler scheduling; weakLeanArgs bounds each compiler.
+        library_command = ["env", "LEAN_NUM_THREADS=1", *library_command]
+    run("library", library_command, cwd=workspace)
     run("library-audit", ["lake", "build", "Verification.Audit"], cwd=workspace)
     run("library-report", ["lake", "build", "Verification.Report"], cwd=workspace)
     run("library-final", ["lake", "build", "Verification"], cwd=workspace)

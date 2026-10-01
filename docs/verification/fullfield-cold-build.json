@@ -1,0 +1,164 @@
+{
+  "status": "passed",
+  "scope": "Cold recompilation of changed project certificate sources, with released dependencies reused. Timings and per-process peak RSS are observations, not formal resource bounds. Some independent checks and a brief scheduling probe ran concurrently on this host.",
+  "platform": "Linux-6.18.39-x86_64-with-glibc2.42",
+  "cpu": "AMD Ryzen 9 5950X 16-Core Processor",
+  "compiler_workers": 1,
+  "largest_case": "STT10Time12",
+  "largest_case_stages": [
+    {
+      "stage": "Inputs",
+      "elapsed": "0:07.85",
+      "maximum_resident_kib": 3662584,
+      "exit_status": 0,
+      "user_seconds": 7.04,
+      "system_seconds": 1.42
+    },
+    {
+      "stage": "InverseCubic",
+      "elapsed": "3:29.03",
+      "maximum_resident_kib": 7838116,
+      "exit_status": 0,
+      "user_seconds": 205.76,
+      "system_seconds": 2.18
+    },
+    {
+      "stage": "ResidualX",
+      "elapsed": "0:45.08",
+      "maximum_resident_kib": 10056380,
+      "exit_status": 0,
+      "user_seconds": 43.58,
+      "system_seconds": 1.82
+    },
+    {
+      "stage": "ResidualY",
+      "elapsed": "0:44.59",
+      "maximum_resident_kib": 9963656,
+      "exit_status": 0,
+      "user_seconds": 43.13,
+      "system_seconds": 1.77
+    },
+    {
+      "stage": "ConstraintFactors",
+      "elapsed": "0:17.96",
+      "maximum_resident_kib": 5083036,
+      "exit_status": 0,
+      "user_seconds": 16.96,
+      "system_seconds": 1.49
+    },
+    {
+      "stage": "ConstraintCross",
+      "elapsed": "11:48.90",
+      "maximum_resident_kib": 15001868,
+      "exit_status": 0,
+      "user_seconds": 699.65,
+      "system_seconds": 3.79
+    },
+    {
+      "stage": "Constraint",
+      "elapsed": "0:09.65",
+      "maximum_resident_kib": 3922056,
+      "exit_status": 0,
+      "user_seconds": 8.89,
+      "system_seconds": 1.37
+    },
+    {
+      "stage": "final",
+      "elapsed": "0:07.95",
+      "maximum_resident_kib": 3703560,
+      "exit_status": 0,
+      "user_seconds": 7.21,
+      "system_seconds": 1.37
+    }
+  ],
+  "largest_stage_peak_resident_kib": 15001868,
+  "other_cases": {
+    "Circle10": {
+      "elapsed": "0:55.01",
+      "maximum_resident_kib": 6704876,
+      "exit_status": 0,
+      "user_seconds": 53.16,
+      "system_seconds": 1.58
+    },
+    "Circle12": {
+      "elapsed": "1:39.05",
+      "maximum_resident_kib": 9685012,
+      "exit_status": 0,
+      "user_seconds": 96.59,
+      "system_seconds": 1.93
+    },
+    "STT8Time10": {
+      "elapsed": "5:47.73",
+      "maximum_resident_kib": 8352272,
+      "exit_status": 0,
+      "user_seconds": 337.98,
+      "system_seconds": 7.06
+    },
+    "STT8Time12": {
+      "elapsed": "10:37.15",
+      "maximum_resident_kib": 10786288,
+      "exit_status": 0,
+      "user_seconds": 623.56,
+      "system_seconds": 8.7
+    }
+  },
+  "previous_compact_arrangement": {
+    "source_sha256": "6deda7041847f1ccd9d46e88953047aac2cd2f3b69c70bfc7ec907aa1f4955b1",
+    "elapsed": "7:34.00",
+    "maximum_resident_kib": 22705264,
+    "exit_status": 0,
+    "user_seconds": 434.12,
+    "system_seconds": 17.05
+  },
+  "preserved_mathematical_contracts": {
+    "Circle10": {
+      "data_path": "GNC/Applications/OrbitalComparison/FullFieldData/Circle10.lean",
+      "data_sha256": "16d646d1a9af3ad4828b8d5af5155e2e76861b1751451490a1364b74319ef045",
+      "prediction_sha256": "01d0dd9e89f3763a8c9de996ff1727d9ff7f20fee7f310f30c17504244c8cdaa",
+      "data_and_final_prediction_unchanged": true
+    },
+    "Circle12": {
+      "data_path": "GNC/Applications/OrbitalComparison/FullFieldData/Circle12.lean",
+      "data_sha256": "403320165599c08cf14f7736736157bc1056f0df3126bce01e6370383866aaf2",
+      "prediction_sha256": "20b7c97a64367880d14668f0521a49ffc1fb2285ee3f0b0630cd2fb46ee834fa",
+      "data_and_final_prediction_unchanged": true
+    },
+    "STT8Time10": {
+      "data_path": "GNC/Applications/OrbitalComparison/FullFieldData/STT8Time10/Inputs.lean",
+      "data_sha256": "c2d4c1733ca973acad2d746067ac69f4208c718ff4d45fdbc36177de7a329a9f",
+      "prediction_sha256": "b52f62273661b1f1c6ce833d1b57f8c28a9b0693a53bf6ac5faed90d04734da3",
+      "data_and_final_prediction_unchanged": true
+    },
+    "STT8Time12": {
+      "data_path": "GNC/Applications/OrbitalComparison/FullFieldData/STT8Time12/Inputs.lean",
+      "data_sha256": "1bbfe181ff0dfa013f1379c44bbeeb322df438fb47ffcf1817e3dbaa4930253d",
+      "prediction_sha256": "b851fd4da4c848e192a11246cc31b5a2305384bd9c4dfe61ca2b6552fa41b5fa",
+      "data_and_final_prediction_unchanged": true
+    },
+    "STT10Time12": {
+      "data_path": "GNC/Applications/OrbitalComparison/FullFieldData/STT10Time12/Inputs.lean",
+      "data_sha256": "0cec0ff66b61777828e0f1c9735cc993e6a66ff1c8d99b50455a03540ab3a059",
+      "prediction_sha256": "2a287013d6fed6d5f525471995a31c1899ff8ebe3fcacd435706b97d9494fce9",
+      "data_and_final_prediction_unchanged": true
+    }
+  },
+  "scheduling_probe": {
+    "scope": "independent six-module build scheduling probe, not a formal resource bound",
+    "results": [
+      {
+        "LEAN_NUM_THREADS": 1,
+        "max_simultaneous_compiler_processes": 1,
+        "elapsed_seconds": 19.30471704696538,
+        "sample_period_seconds": 0.1
+      },
+      {
+        "LEAN_NUM_THREADS": 2,
+        "max_simultaneous_compiler_processes": 2,
+        "elapsed_seconds": 9.735791372018866,
+        "sample_period_seconds": 0.1
+      }
+    ]
+  },
+  "hosted_ci_status": "new run required; previous a966cc0 run 36826695779 failed with exit 143",
+  "proof_policy": "All proposals are checked by decide +kernel against the original exact expressions; no native decision procedure, added axiom, relaxed bound or numerical slack."
+}

@@ -57,6 +57,15 @@ jobs:
             .lake/packages
             .lake/mathlib-cache
           key: ${{ steps.dependencies.outputs.cache-primary-key }}
+      # The largest measured exact check still needs about 14.3 GiB on this
+      # release. Add disk-backed headroom for the 16 GiB hosted runner; this
+      # does not change the proof terms or any mathematical error budget.
+      - name: Provide swap for cold exact certificate checks
+        run: |
+          sudo fallocate -l 8G /gnc-proof-swap
+          sudo chmod 600 /gnc-proof-swap
+          sudo mkswap /gnc-proof-swap
+          sudo swapon /gnc-proof-swap
       - name: Record runner resources
         run: |
           free -h
@@ -102,7 +111,7 @@ jobs:
           ) &
           gnc_monitor_pid=$!
           trap 'kill "$gnc_monitor_pid" 2>/dev/null || true' EXIT
-          nix develop --command python scripts/verify.py
+          GNC_SERIAL_BUILD=1 nix develop --command python scripts/verify.py
       - name: Check report against this exact source snapshot
         run: nix develop --command python scripts/verify.py --check-report .lake/verification/report.json
       # Cache completed modules even after an ordinary build/test failure.

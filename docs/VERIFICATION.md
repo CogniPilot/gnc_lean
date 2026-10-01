@@ -56,6 +56,16 @@ Lean shell does not use `LEAN_NUM_THREADS` for that setting. The time-degree-12
 Bernstein certificate verifies individual exact proposals, reconstructions and
 bounds before assembling the unchanged physical certificate. No native decision
 procedure or relaxed error budget is used.
+The full-field polynomial certificates likewise normalize exact rational
+intermediates using kernel-checked equalities in separate imported stages.
+CI sets `GNC_SERIAL_BUILD=1`; the verifier sets `LEAN_NUM_THREADS=1` on the
+complete Lake build after entering the flake shell. This schedules one compiler
+process at a time, with unchanged proof cache keys. The complete build, axiom
+audit and regressions remain required. This scheduling setting is not a formal
+memory bound or a change to a mathematical inequality.
+The hosted workflow adds 8 GiB of temporary disk-backed swap: the largest
+measured separated check still requires about 14.3 GiB, close to the runner's
+16 GiB RAM capacity. This is build-resource headroom, not a numerical tolerance.
 
 Use `nix develop --command python scripts/verify.py --fresh` for an explicit
 clean verification. This isolated build starts with no project proof

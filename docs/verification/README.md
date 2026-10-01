@@ -5,15 +5,15 @@ and control.** Every included theorem is checked by Lean's kernel under its
 stated hypotheses, with no admitted proofs or additional project axioms.
 
 The [source-hashed record](latest.json) passed on
-2026-10-01T07:28:44.874290+00:00. It covers:
+2026-10-01T09:22:38.935675+00:00. It covers:
 
-- 1669 GNC modules: 1667 mathematical modules and 2 executable-tool modules.
-- 44,368 theorem declarations (including generated lemmas).
-- 32,762 application theorem declarations, included in those totals.
+- 1690 GNC modules: 1688 mathematical modules and 2 executable-tool modules.
+- 44,597 theorem declarations (including generated lemmas).
+- 32,991 application theorem declarations, included in those totals.
 - 87 passing library audit, release, cache and planner regression checks.
-- 1,690 source/configuration files identified by SHA-256, including CI workflows.
+- 1,711 source/configuration files identified by SHA-256, including CI workflows.
 
-All 1673 project Lean files live under `GNC/`; four are verification tooling.
+All 1694 project Lean files live under `GNC/`; four are verification tooling.
 Declaration counts include generated lemmas, not just statements in papers.
 The only foundations are `propext`, `Classical.choice` and `Quot.sound`, using
 released Lean 4.29.1 and mathlib v4.29.1. The audit separately recognizes 79
@@ -45,7 +45,7 @@ This complete audit covers the library after separating it into its own
 repository. All application proofs remain covered. Paper experiment programs
 and their numerical comparison tests now belong to the consuming papers
 repository, so their former counts are not part of the library regression
-total or source-hash inventory. The current incremental audit reused 1665
+total or source-hash inventory. The earlier incremental audit reused 1665
 module artifacts and rebuilt 2; released dependency proofs were reused too.
 The new vanishing gravity-coefficient and regional BIBO proofs,
 including the disturbance-budget optimization, are covered. The
@@ -1254,7 +1254,7 @@ hosted run must still pass before claiming hosted CI is green.
 
 ## October 1 cold certificate build
 
-The current whole-library audit reused 1,664 module artifacts and rebuilt three.
+The earlier Bernstein-certificate audit reused 1,664 module artifacts and rebuilt three.
 The changed STT8/time-degree-12 certificate was separately compiled before the
 audit. Its public prediction, hypotheses and exact error budgets are unchanged;
 individual Bernstein proposals/reconstructions are now checked in separate
@@ -1286,3 +1286,33 @@ Both modules are exported through `GNC.Core` and included in the complete
 source-hashed audit. The consuming paper's symbolic generator, C++ graph,
 float32 diagnostics and host timings are separately tested programs, not
 verified machine code. No full-estimator speed or accuracy theorem follows.
+
+
+## October 1 full-field certificate memory and complete audit
+
+The current audit reused 1,686 module artifacts and rebuilt four after the
+changed certificates had been compiled separately. It covers all 1,690
+mathematical/tool modules, the symmetry and continuous bias identities above,
+and every application certificate. All 87 regression cases passed.
+
+The full-field candidates, forcing/envelope coefficients, hypotheses and final
+prediction statements are unchanged. The polynomial cases now check exact
+quadratic factors, their product, the inverse cubic, and the residual envelopes
+in separate imported stages before assembling the same certificate. All
+normalization proposals are checked by the kernel; no native decision procedure
+or added slack is used.
+
+The [cold-build resource record](fullfield-cold-build.json) covers all five
+changed cases and hashes the unchanged data/prediction contracts. The largest
+separated stage peaked at 15,001,868 KiB (about 14.3 GiB), compared with
+22,705,264 KiB for the preceding compact layout. Its slower cold check is an
+explicit tradeoff; Lake caches each completed stage for subsequent builds.
+Measurements are per-process observations on this host, not formal memory or
+worst-case execution-time bounds. Some independent checks ran concurrently.
+
+CI runs the complete Lake build with one compiler process at a time and adds
+8 GiB of temporary swap for headroom on its 16 GiB hosted runner. An independent
+six-module probe observed exactly one/two concurrent compilers with scheduling
+settings one/two. The preceding a966cc0 hosted run failed with exit 143 under
+memory pressure; these local passes do not claim that the next hosted run has
+passed.

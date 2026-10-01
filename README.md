@@ -81,6 +81,10 @@ artifacts after ordinary failures, so a retry can resume. An abrupt runner
 shutdown can prevent final uploads; a saved partial cache is not a passing
 verification record. `GNC_VERIFY_STREAM=1` exposes live Lake output and a
 minute-by-minute heartbeat while retaining full logs for the final audit.
+CI also uses `GNC_SERIAL_BUILD=1` to run the complete Lake build with one
+compiler process at a time. This avoids concurrent large certificate checks;
+it does not skip any module or relax the verification policy. The same override
+can be used locally on machines with limited memory.
 
 ## Applications and papers
 
