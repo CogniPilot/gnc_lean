@@ -245,6 +245,7 @@ import GNC.Estimation.InertialBias
 import GNC.Estimation.SampledErrorBound
 import GNC.Estimation.GpsDeniedGeometry
 import GNC.Estimation.LieErrorEnvelope
+import GNC.Estimation.CorrectionErrorBound
 import GNC.Control.ThrustSupport
 import GNC.Control.SharedBias
 import GNC.Control.ThrustIntegral
