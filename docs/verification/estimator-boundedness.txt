@@ -1,0 +1,46 @@
+Sampled estimator error bounds
+
+GNC.Estimation.SampledErrorBound proves regional nonlinear sampled-error
+containment, invariant tubes, finite GPS-outage growth, GPS-return recovery
+and forward-publication bounds. The map certificates are conditional and
+uniform over explicit admissible contexts. Accepted and rejected measurement
+branches both need certificates; no trajectory containment is assumed in
+place of proving it.
+
+GNC.Estimation.LieErrorEnvelope derives finite-time navigation error bounds
+from GNC's exact SE_2(3) log equations. Matched bias gives an exact triangular
+linear flow. The biased result retains nonlinear tangent-bias forcing with
+explicit uniform bounds. Local/right coordinate conjugacy and Euclidean
+Cartesian position/velocity reconstruction are proved, including the pose
+lever-arm terms required by right-error reconstruction.
+
+GNC.Estimation.GpsDeniedGeometry proves horizontal translation invariance
+for ideal flat-ground, spatially uniform-field flow/range/barometer/magnetic
+and inertial observations, identical histories, and an estimator-independent
+minimax error lower bound. This excludes terrain/landmark/magnetic maps and
+any additional absolute-position information from earlier GPS history.
+
+Ordered upper envelopes alone do not establish lower actual error. A separate
+uniform-upper/rival-witness theorem states a sufficient strict worst-case
+comparison on a common admissible input set. Neither that theorem nor the
+local quadratic-versus-cubic comparison instantiates ESKF, native PX4 EKF2 or
+native ArduPilot EKF3. Numeric map/forcing/branch certificates, Gaussian event
+coverage, compiler/IEEE754 refinement and native-filter superiority remain
+open obligations. The existing matched experiments still contain ESKF losses.
+
+All 38 delivered public theorems are checked with Lean 4.29.1, auditing only
+propext, Classical.choice and Quot.sound. The accompanying modelica_models
+review retains identical sources, a checker that rechecks five direct GNC
+dependencies in an owned cache overlay, audit rejection controls and the
+source/artifact receipt. It is a targeted module check, not a full GNC build.
+
+Targeted Lake builds:
+  lake build GNC.Estimation.SampledErrorBound
+  lake build GNC.Estimation.GpsDeniedGeometry
+  lake build GNC.Estimation.LieErrorEnvelope
+
+Review and reproducible audit runner:
+  https://github.com/CogniPilot/modelica_models/tree/main/docs/reviews/2026-10-08/bounded-error
+  tools/estimator_comparison/check_bounded_error.py in modelica_models
+
+No native firmware sources are copied into this repository or modelica_models.
