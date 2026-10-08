@@ -1,0 +1,56 @@
+Correlated Kalman correction and inertial aiding observability
+============================================================
+
+GNC.Estimation.KalmanCorrection proves exact-real identities for arbitrary
+finite-dimensional state and observation spaces. These results apply to an
+ESKF, EKF, Schmidt filter, or any other correction with the stated covariance
+model. They do not assert superiority of a named flight stack.
+
+Let P=Cov(e), R=Cov(v), C=Cov(e,v), and innovation H e+v.
+Then B=P H^T+C and S=H P H^T+H C+C^T H^T+R.
+The correction error is (I-KH)e-Kv.
+
+generalized_joseph identifies its covariance with
+P-K B^T-B K^T+K S K^T. It requires symmetric P and allows arbitrary K,
+including constrained or projected gains. Omitting the cross terms is invalid
+when observation noise and prior error are correlated.
+
+gain_gap proves that if Kopt S=B and S is symmetric, the covariance gap is
+(K-Kopt) S (K-Kopt)^T. gain_gap_positive_semidefinite makes the corresponding
+Loewner-order statement for PSD S. This is modeled linear covariance, not
+actual nonlinear estimation MSE. Equally modeled optimal gains can tie.
+
+conditional_factor_identity assumes the representation
+P=L L^T, C=L U, R=U^T U+V V^T. For F=I-KH, the posterior becomes
+(F L-K U^T)(F L-K U^T)^T+(K V)(K V)^T.
+conditional_factor_positive_semidefinite proves its PSD property for any K.
+The theorem assumes valid factors; it does not verify a floating-point solver.
+
+With invertible L, an implementation obtains U by solving L U=C and checks
+the conditional measurement covariance R-U^T U. Positive innovation S alone
+is insufficient: impossible_scalar_joint gives P=H=R=1, C=2, S=6 and a
+negative posterior variance. Invalid joint covariances must be rejected.
+
+GNC.Estimation.InertialAidingObservability models body-frame optical-flow
+rates, range above flat ground, and a constant local magnetic field. For its
+physical interpretation assume positive height, known rotation conventions,
+fixed ground and field, and position-independent inertial dynamics.
+
+horizontal_translation_unobservable proves that any horizontal translation
+leaves this observation unchanged. prediction_preserves_translation proves
+the same symmetry for a constant-acceleration position prediction.
+gps_observes_translation proves that a direct position observation separates
+nonzero translations. These results describe an information limitation, not
+a guarantee of a particular filter's observability consistency or recovery.
+They exclude mapped terrain, spatial magnetic maps, landmarks and other
+position-dependent aiding. An initial prior can still anchor an estimate.
+
+Both modules are exported through GNC.Core. Their intended application is the
+separately maintained CogniPilot Modelica ESKF and its generated-C adversarial
+tests. There is no formal refinement from those implementations to Lean here.
+
+Qualification for this change: Lean 4.29.1, targeted source recompilation of
+ten estimation modules using the pinned checked dependency cache, project
+kernel axiom audit, and scripts/check_structure.py. The audit permits only
+propext, Classical.choice and Quot.sound; no admitted project theorem or
+project axiom is permitted. This is not a full release verification run.
