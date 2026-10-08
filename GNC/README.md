@@ -39,7 +39,7 @@ than relying only on a textual import scan.
 | Analysis | Continuous linear ODEs, differential-defect error bounds, comparison, analytic coefficients and mixed flows |
 | Lie | SO(3), SE₂(3), manifolds, tangent algebras, actual exponential/logarithm and Jacobians |
 | Dynamics | Gravity fields, exact mixed/log error dynamics, group-affine rigidity and representation criteria |
-| Estimation | Group-affine errors, equivariance tests, bearing output bounds, noise coordinates and regional convergence certificates |
+| Estimation | Group-affine errors, bearing output bounds, noise coordinates, correlated Kalman covariance, inertial aiding observability and regional convergence certificates |
 | Preintegration | Closed-form block exponential and mixed IVP |
 | Magnus | Noncommutative coefficients, input algebra and flow composition |
 | Planning | Dubins arc/line propagation, transverse Hermite offsets, metric correction, regularity, constant-speed reference derivatives and bank rate |

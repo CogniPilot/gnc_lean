@@ -235,6 +235,8 @@ import GNC.Lie.TwoFrame
 import GNC.Lie.AffineExponential
 import GNC.Estimation.NoiseCoordinates
 import GNC.Estimation.CovariancePropagation
+import GNC.Estimation.KalmanCorrection
+import GNC.Estimation.InertialAidingObservability
 import GNC.Estimation.PredictionMoments
 import GNC.Lie.SimilarityExponential
 import GNC.Dynamics.GravityGeometry
